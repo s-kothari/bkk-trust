@@ -1,68 +1,109 @@
 import React from "react";
-import { useParams } from "react-router-dom";
-import Card from "./components/Card";
-
-// interface Params {
-//   id: any;
-// }
-
-const children_courses = [
-  {
-    title: "Technology",
-    description:
-      "A basic computer course is carried out at the organization which includes Microsoft Word, Excel, Power Point and Internet etc. Generous donors have given us several computers, which makes it an hands-on learning for the children. After this course, the children are better equipped in today’s digital age, and many have also been hired as receptionists in hospitals, schools and offices.",
-    image: "",
-    color: "",
-  },
-  {
-    title: "English Language",
-    description:
-      "Another important skill in today’s world, we try to make them more comfortable and fluent in English conversation.    ",
-    image: "",
-    color: "",
-  },
-];
+import { Link } from "react-router-dom";
+import { childrensPrograms, womensPrograms } from "./programs";
+import CommunityMap from "./components/CommunityMap";
 
 const ImpactPage: React.FC = () => {
-  //   const { id } = useParams();
-
   return (
-    <div className="sm:mx-8 mx-4 h-[1000px] mt-12">
-      <div className="">
-        motivation section
-        <span>
-          Bkk Trust recognizes that the children are the future, and therefore
-          along with Women’s empowerment and education, works on helping today’s
-          underprivileged youth rise. Boys upto the age of ….. are supported by
-          the Trust, where as girls can continue for as long as they wish.
-          Education A lot of school going children need a little support after
-          school to reinforce their school lessons. The teachers at the Trust
-          give them personal attention, help them with any difficulties they
-          face in understanding their subjects, and answer their questions. This
-          way, the children have a better grip of their studies, are able to
-          score higher marks, and develop into confident individuals. There are
-          several children who joined the institute from it’s day of inception,
-          and are still coming in everyday .. and we feel proud to see how they
-          have blossomed into confident young adults! When asked, they say that
-          they never want to stop coming..!
-        </span>
-      </div>
-      <div>Courses section</div>
-      <div className="flex flex-row space-x-4">
-        {children_courses.map((item) => (
-          <Card
-            title={item.title}
-            subtext={item.description}
-            url=""
-            image={"/logo512.png"}
-            color={"#aaaaaa"}
-            list={[]}
-            key={item.title}
-          ></Card>
-        ))}
+    <div className="bg-white py-12 sm:py-16">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-4xl text-center">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Our Impact
+          </h1>
+          <p className="mt-6 text-lg leading-8 text-gray-600">
+            We are dedicated to creating lasting change by empowering the most
+            vulnerable members of our community in Jaipur, Rajasthan. Our
+            programs are designed to provide not just skills, but also the
+            confidence and support system needed to build a self-reliant future.
+          </p>
+        </div>
       </div>
 
-      {/* <p>ID: {id}</p> */}
+      {/* Map Section */}
+      <div className="mt-8 sm:mt-12">
+        <CommunityMap backgroundColor="#FEFCE8" />
+      </div>
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        {/* Women's Programs Section */}
+        <div className="mx-auto mt-16 max-w-2xl sm:mt-24 lg:mt-32 lg:max-w-none">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Empowering Women for a Brighter Future:
+            </h2>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl italic">
+              Kothari Mahila Sahayata Kendra
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Our core mission is to uplift and empower women, providing them
+              with the skills and confidence to achieve financial independence
+              and a dignified life.
+            </p>
+          </div>
+          <dl className="mt-12 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-y-16">
+            {womensPrograms.slice(0, 3).map((program: any) => (
+              <div key={program.title} className="relative pl-16">
+                <dt className="text-base font-semibold leading-7 text-gray-900">
+                  <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500">
+                    <program.icon className="h-6 w-6 text-white" />
+                  </div>
+                  {program.title}
+                </dt>
+                <dd className="mt-2 text-base leading-7 text-gray-600">
+                  {program.description}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <div className="mt-12 text-center">
+            <Link
+              to="/impact/women"
+              className="text-amber-600 hover:text-amber-800 font-semibold"
+            >
+              Learn About Our Women's Empowerment Initiatives &rarr;
+            </Link>
+          </div>
+        </div>
+
+        {/* Children's Programs Section */}
+        <div className="mx-auto mt-16 max-w-2xl sm:mt-24 lg:mt-32 lg:max-w-none">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Investing in the Next Generation
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              At BKK Trust, we believe children are the architects of our
+              future. We are dedicated to nurturing underprivileged youth,
+              providing them with a foundation to thrive. Our support extends to
+              boys up to the age of 12, while girls can continue with us for as
+              long as they need.
+            </p>
+          </div>
+          <dl className="mt-12 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-y-16">
+            {childrensPrograms.map((program: any) => (
+              <div key={program.title} className="relative pl-16">
+                <dt className="text-base font-semibold leading-7 text-gray-900">
+                  <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500">
+                    <program.icon className="h-6 w-6 text-white" />
+                  </div>
+                  {program.title}
+                </dt>
+                <dd className="mt-2 text-base leading-7 text-gray-600">
+                  {program.description}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <div className="mt-12 text-center">
+            <Link
+              to="/impact/children"
+              className="text-amber-600 hover:text-amber-800 font-semibold"
+            >
+              Explore All Children's Courses &rarr;
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

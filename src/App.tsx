@@ -1,32 +1,49 @@
-import React from "react";
-import logo from "./logo.svg";
+import React, { useState } from "react";
 import "./App.css";
 import Header from "./components/header";
 import Footer from "./components/footer";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import HomePage from "./Homepage";
 import AboutPage from "./About";
 import DonatePage from "./DonatePage";
 import ImpactPage from "./ImpactPage";
+import ContactPage from "./ContactPage";
+import WomensPage from "./WomensPage";
+import ChildrensPage from "./ChildrensPage";
+import ScrollToTop from "./components/ScrollToTop";
+
+const AppContent = () => {
+  const [isHeaderLocked, setIsHeaderLocked] = useState(false);
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+
+  const shouldHavePadding = !isHomePage || isHeaderLocked;
+
+  return (
+    <>
+      <Header isLocked={isHeaderLocked} setIsLocked={setIsHeaderLocked} />
+      <main style={{ paddingTop: shouldHavePadding ? "80px" : "0px" }}>
+        <Routes>
+          <Route path="/" element={<HomePage isLocked={isHeaderLocked} />} />
+          <Route path="about" element={<AboutPage />} />
+          <Route path="impact" element={<ImpactPage />} />
+          <Route path="impact/women" element={<WomensPage />} />
+          <Route path="impact/children" element={<ChildrensPage />} />
+          <Route path="donate" element={<DonatePage />} />
+          <Route path="contact" element={<ContactPage />} />
+        </Routes>
+      </main>
+      <Footer />
+    </>
+  );
+};
 
 function App() {
   return (
     <BrowserRouter>
-      <Header></Header>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="about" element={<AboutPage />} />
-        <Route path="impact" element={<ImpactPage />} />
-
-        <Route path="donate" element={<DonatePage />} />
-      </Routes>
-      <Footer></Footer>
+      <ScrollToTop />
+      <AppContent />
     </BrowserRouter>
-    // <div className="App bg-amber-50">
-    //   <Header></Header>
-    //   <div className="bg-amber-50 h-[1000px]"></div>
-    //   <Footer></Footer>
-    // </div>
   );
 }
 
