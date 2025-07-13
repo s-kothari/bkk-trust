@@ -4,9 +4,9 @@ import DonationInquiryForm from "./components/DonationInquiryForm";
 
 const DonatePage: React.FC = () => {
   return (
-    <div className="bg-white">
+    <div>
       {/* Hero Section */}
-      <div className="relative bg-amber-50">
+      <div className="relative">
         <div className="mx-auto max-w-7xl px-6 lg:px-8 py-24 sm:py-32">
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
@@ -46,7 +46,7 @@ const DonatePage: React.FC = () => {
 
         <div className="mt-16 grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:gap-x-8">
           {/* Women's Empowerment */}
-          <div className="rounded-2xl bg-gray-50 p-8 ring-1 ring-inset ring-gray-200">
+          <div className="rounded-2xl p-8 ring-1 ring-inset ring-gray-200">
             <h3 className="text-2xl font-bold tracking-tight text-gray-900">
               Empower Women to Learn and Thrive
             </h3>
@@ -63,7 +63,7 @@ const DonatePage: React.FC = () => {
           </div>
 
           {/* Children's Future */}
-          <div className="rounded-2xl bg-gray-50 p-8 ring-1 ring-inset ring-gray-200">
+          <div className="rounded-2xl p-8 ring-1 ring-inset ring-gray-200">
             <h3 className="text-2xl font-bold tracking-tight text-gray-900">
               Invest in the Next Generation
             </h3>
@@ -92,7 +92,7 @@ const DonatePage: React.FC = () => {
       </div>
       <DonationInquiryForm />
       {/* Donation Form Section */}
-      <div id="donate-form" className="bg-amber-50 py-24 sm:py-32">
+      <div id="donate-form" className="py-24 sm:py-32">
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -105,7 +105,7 @@ const DonatePage: React.FC = () => {
             </p>
           </div>
 
-          <div className="mt-16 bg-white p-8 rounded-lg shadow-md">
+          <div className="mt-16 p-8 rounded-lg shadow-md">
             <h3 className="text-2xl font-bold tracking-tight text-gray-900 text-center">
               Bank Transfer Details
             </h3>

@@ -75,62 +75,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   </AnimatePresence>
 );
 
-interface CollapsedNavProps {
-  handleScrollToTop: () => void;
-  headerItems: { name: string; linkTo: string }[];
-  handleNavClick: (section: string) => void;
-  setMobileMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const CollapsedNav: React.FC<CollapsedNavProps> = ({
-  handleScrollToTop,
-  headerItems,
-  handleNavClick,
-  setMobileMenuOpen,
-}) => (
-  <motion.nav
-    className="fixed top-0 left-0 right-0 bg-[#99bec7] backdrop-blur-sm border-b border-amber-400/20 z-50"
-    initial={{ y: "-100%" }}
-    animate={{ y: "0%" }}
-    transition={{ duration: 0.3, ease: "easeInOut" }}
-  >
-    <div className="flex items-center justify-between px-4 sm:px-8 py-4">
-      <motion.div
-        className="text-[#1a1a1a] font-bold text-lg cursor-pointer"
-        onClick={() => handleNavClick("")}
-      >
-        BKK Charitable Trust
-      </motion.div>
-      <div className="hidden md:flex items-center gap-8">
-        {headerItems.map((item) => (
-          <button
-            key={item.name}
-            onClick={() => handleNavClick(item.linkTo)}
-            className="text-[#2d2d2d] font-medium hover:text-[#1a1a1a] transition-colors duration-200"
-          >
-            {item.name}
-          </button>
-        ))}
-        <button
-          onClick={() => handleNavClick("donate")}
-          className="px-6 py-2.5 bg-[#1a1a1a] text-white font-semibold rounded-full shadow-sm hover:bg-[#333333] transition-all duration-200 hover:shadow-md"
-        >
-          Donate
-        </button>
-      </div>
-      <div className="md:hidden">
-        <button
-          onClick={() => setMobileMenuOpen(true)}
-          className="text-[#1a1a1a]"
-          aria-label="Open menu"
-        >
-          <Menu size={28} />
-        </button>
-      </div>
-    </div>
-  </motion.nav>
-);
-
 const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
   const { scrollY } = useScroll();
   const location = useLocation();
@@ -144,11 +88,23 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const isHomePage = location.pathname === "/";
+  const isLightBg = currentStep >= 1;
 
-  // Reset lock state when navigating away from homepage
+  // Set header state based on page
   useEffect(() => {
     if (!isHomePage) {
+      setHeaderCollapsed(true);
+      setHasScrolled(true);
+      setCurrentStep(2);
+      setIsLocked(true);
+      setAnimationProgress(1);
+    } else {
+      // Reset state when navigating back to home page
+      setHeaderCollapsed(false);
+      setHasScrolled(false);
+      setCurrentStep(0);
       setIsLocked(false);
+      setAnimationProgress(0);
     }
   }, [isHomePage, setIsLocked]);
 
@@ -160,16 +116,22 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
   };
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (isAnimating || isLocked || !isHomePage) return;
+    if (isAnimating || !isHomePage) return;
 
     // Determine which step we should be in based on scroll position
-    let targetStep = 0;
+    let targetStep;
     if (latest >= SCROLL_THRESHOLDS.COLLAPSED) {
       targetStep = 2;
     } else if (latest >= SCROLL_THRESHOLDS.ANIMATED) {
       targetStep = 1;
     } else {
-      targetStep = 0;
+      // If we've already been past the initial state, don't go back to it on scroll up.
+      // Stay at the fully animated state.
+      if (hasScrolled) {
+        targetStep = 1;
+      } else {
+        targetStep = 0;
+      }
     }
 
     // If we need to change steps, trigger the animation
@@ -191,6 +153,7 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
         setAnimationProgress(1);
         setHeaderCollapsed(false);
         setHasScrolled(true);
+        setIsLocked(false); // Unlock for content interaction
       } else if (targetStep === 2) {
         setAnimationProgress(1);
         setHeaderCollapsed(true);
@@ -209,11 +172,10 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
     if (isAnimating) return;
 
     if (currentStep === 0) {
-      // Scroll to animated state
-      window.scrollTo({ top: SCROLL_THRESHOLDS.ANIMATED, behavior: "smooth" });
-    } else if (currentStep === 1) {
-      // Scroll to collapsed state
-      window.scrollTo({ top: SCROLL_THRESHOLDS.COLLAPSED, behavior: "smooth" });
+      window.scrollTo({
+        top: SCROLL_THRESHOLDS.COLLAPSED,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -243,25 +205,6 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
       }
     };
   }, []);
-
-  if (!isHomePage || isLocked) {
-    return (
-      <>
-        <CollapsedNav
-          handleScrollToTop={handleScrollToTop}
-          headerItems={headerItems}
-          handleNavClick={handleNavClick}
-          setMobileMenuOpen={setMobileMenuOpen}
-        />
-        <MobileMenu
-          isMobileMenuOpen={isMobileMenuOpen}
-          setMobileMenuOpen={setMobileMenuOpen}
-          headerItems={headerItems}
-          handleNavClick={handleNavClick}
-        />
-      </>
-    );
-  }
 
   return (
     <>
@@ -301,14 +244,14 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
             initial={{ bottom: "40%", opacity: 0.3 }}
             animate={{
               bottom: headerCollapsed ? "0%" : "40%",
-              opacity: headerCollapsed ? 0 : 0.8,
+              opacity: currentStep >= 1 ? 0 : 0.8,
             }}
             transition={{ duration: 0.6 }}
           />
 
           {/* Sun container */}
           <motion.div
-            className="absolute  inset-x-0 flex justify-center"
+            className="absolute  inset-x-0 flex justify-center z-10"
             initial={{ bottom: "40%", y: "50%" }}
             animate={{
               bottom: headerCollapsed
@@ -316,8 +259,8 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                 : currentStep >= 1
                 ? "60%"
                 : "40%",
-              scale: headerCollapsed ? 0.3 : 1,
-              y: headerCollapsed ? "0%" : currentStep >= 1 ? "0%" : "50%",
+              scale: headerCollapsed ? 0.175 : 1,
+              y: headerCollapsed ? "37%" : currentStep >= 1 ? "0%" : "50%",
             }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
@@ -406,12 +349,28 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
             <motion.img
               src="/banner.png"
               alt="Banner"
-              className="absolute w-[26rem] object-contain"
+              className="absolute w-[26rem] object-contain pointer-events-none"
               style={{ top: "-30px" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: currentStep >= 1 ? 1 : 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
             />
+            {/* Trust Title */}
+            {/* <motion.h1
+              className="uppercase absolute font-garamond font-bold text-gray-800 text-2xl pointer-events-none"
+              style={{
+                top: "300px",
+                textShadow: "1px 1px 3px rgba(0,0,0,0.2)",
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{
+                opacity: currentStep >= 1 ? 1 : 0,
+                y: currentStep >= 1 ? 0 : 20,
+              }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
+              {`Bhimraj\n Kamlawati Kothari Trust`}
+            </motion.h1> */}
           </motion.div>
 
           {/* Indian Flags - Centered positioning */}
@@ -424,16 +383,16 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                 {/* Left Flag */}
                 <motion.div
                   className="relative"
-                  style={{ marginRight: "45px" }}
+                  style={{ marginRight: "0px" }}
                   initial={{ scale: 0, opacity: 0, y: 20, rotate: -20 }}
-                  animate={{ scale: 1, opacity: 1, y: 0, rotate: -30 }}
+                  animate={{ scale: 1, opacity: 1, y: 0, rotate: -25 }}
                   exit={{ scale: 0, opacity: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                 >
                   <img
-                    src="/flag-r-2.png"
+                    src="/flag.png"
                     alt="Indian Flag"
-                    className="-scale-x-100 w-44 h-50 object-contain drop-shadow-lg"
+                    className="-scale-x-100 w-64 h-50 object-contain drop-shadow-lg"
                   />
                 </motion.div>
 
@@ -443,16 +402,16 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                 {/* Right Flag */}
                 <motion.div
                   className="relative"
-                  style={{ marginLeft: "45px" }}
+                  style={{ marginLeft: "0px" }}
                   initial={{ scale: 0, opacity: 0, y: 20, rotate: 20 }}
-                  animate={{ scale: 1, opacity: 1, y: 0, rotate: 30 }}
+                  animate={{ scale: 1, opacity: 1, y: 0, rotate: 25 }}
                   exit={{ scale: 0, opacity: 0 }}
                   transition={{ duration: 0.6, delay: 0.3 }}
                 >
                   <img
-                    src="/flag-r-2.png"
+                    src="/flag.png"
                     alt="Indian Flag"
-                    className="w-44 h-50 object-contain drop-shadow-lg"
+                    className="w-64 h-50 object-contain drop-shadow-lg"
                   />
                 </motion.div>
               </div>
@@ -462,7 +421,7 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
           {/* Scroll indicator */}
           <AnimatePresence>
             {currentStep === 0 && !headerCollapsed && (
-              <div className="absolute bottom-20 inset-x-0 flex justify-center">
+              <div className="absolute bottom-20 inset-x-0 flex justify-center z-30">
                 <motion.button
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -484,18 +443,19 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
 
           {/* Navigation Bar */}
           <motion.nav
-            className="absolute bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-sm border-t border-amber-400/30"
+            className="absolute bottom-0 left-0 right-0 "
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
             <div className="flex items-center justify-between px-4 sm:px-8 py-4">
               <motion.div
-                className="text-white font-bold text-lg cursor-pointer"
-                onClick={handleScrollToTop}
+                className="font-bold text-lg cursor-pointer font-didact"
+                onClick={() => handleNavClick("")}
                 animate={{
                   opacity: headerCollapsed ? 1 : 0,
                   x: headerCollapsed ? 0 : -20,
+                  color: isLightBg ? "#1a1a1a" : "#ffffff",
                 }}
                 transition={{ duration: 0.3 }}
               >
@@ -504,29 +464,63 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
 
               <div className="hidden md:flex items-center gap-8">
                 {headerItems.map((item) => (
-                  <button
+                  <motion.div
                     key={item.name}
-                    onClick={() => handleNavClick(item.linkTo)}
-                    className="text-amber-100 font-medium hover:text-amber-300 transition-colors duration-200"
+                    className="relative"
+                    whileHover="hover"
+                    animate="rest"
+                    initial="rest"
                   >
-                    {item.name}
-                  </button>
+                    <motion.button
+                      onClick={() => handleNavClick(item.linkTo)}
+                      className="font-medium transition-colors duration-200"
+                      animate={{
+                        color: isLightBg ? "#2d2d2d" : "#fef3c7",
+                      }}
+                      variants={{
+                        hover: { color: isLightBg ? "#000000" : "#ffffff" },
+                      }}
+                    >
+                      {item.name}
+                    </motion.button>
+                    <motion.div
+                      className="absolute bottom-[-5px] left-0 w-full h-[2px]"
+                      style={{
+                        backgroundColor: isLightBg ? "#000000" : "#ffffff",
+                      }}
+                      variants={{
+                        hover: { scaleX: 1 },
+                        rest: { scaleX: 0 },
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </motion.div>
                 ))}
-                <button
+                <motion.button
                   onClick={() => handleNavClick("donate")}
-                  className="px-6 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                  className="px-6 py-2 font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                  animate={{
+                    background: isLightBg ? "#1a1a1a" : "#ffffff",
+                    color: isLightBg ? "#ffffff" : "#000000",
+                  }}
+                  whileHover={{
+                    background: isLightBg
+                      ? "#333333"
+                      : "linear-gradient(to right, #d97706, #b45309)",
+                  }}
                 >
                   Donate
-                </button>
+                </motion.button>
               </div>
               <div className="md:hidden">
-                <button
+                <motion.button
                   onClick={() => setMobileMenuOpen(true)}
-                  className="text-white"
+                  className=""
                   aria-label="Open menu"
+                  animate={{ color: isLightBg ? "#1a1a1a" : "#ffffff" }}
                 >
                   <Menu size={28} />
-                </button>
+                </motion.button>
               </div>
             </div>
           </motion.nav>

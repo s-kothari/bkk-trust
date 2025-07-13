@@ -32,7 +32,7 @@ const sections = [
 const HomePage: React.FC<HomePageProps> = ({ isLocked }) => {
   return (
     <div
-      className="App bg-amber-50"
+      className="App"
       style={{
         scrollSnapType: isLocked ? "none" : "y mandatory",
         scrollBehavior: "smooth",
@@ -47,11 +47,11 @@ const HomePage: React.FC<HomePageProps> = ({ isLocked }) => {
 
       {/* Demo content to show scrolling */}
       <div
-        className="min-h-screen bg-amber-50 p-8"
+        className="min-h-screen p-8"
         style={{ scrollSnapAlign: isLocked ? "none" : "start" }}
       >
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">
+          <h2 className="text-3xl font-bold text-gray-800 mb-4 font-didact">
             Bhimraj Kamlawati Kothari Charitable Trust
           </h2>
           <p className="text-gray-600 mb-8">
@@ -61,10 +61,7 @@ const HomePage: React.FC<HomePageProps> = ({ isLocked }) => {
 
           {/* Demo content blocks */}
           {sections.map((s) => (
-            <div
-              key={s.sectionName}
-              className="bg-white rounded-lg shadow-md p-6 mb-6"
-            >
+            <div key={s.sectionName} className="rounded-lg shadow-md p-6 mb-6">
               <h3 className="text-xl font-semibold text-gray-700 mb-3">
                 {s.sectionName}
               </h3>

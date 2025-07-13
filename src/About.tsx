@@ -9,9 +9,9 @@ const AboutPage: React.FC = () => {
   //   const { id } = useParams();
 
   return (
-    <>
+    <div>
       <OurStory />
-    </>
+    </div>
   );
 };
 

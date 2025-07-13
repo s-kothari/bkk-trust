@@ -12,16 +12,17 @@ const benefactors = [
 
 const OurStory: React.FC = () => {
   return (
-    <div className="bg-amber-50 py-16 sm:py-24">
+    <div className="bg-amber-50/50 py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:mx-0">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Our Story
           </h2>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            From a global legacy in gemstone trading to a grassroots movement
-            for women's empowerment, the Bhimraj Kamlawati Kothari (BKK) Trust
-            is built on a foundation of vision, resilience, and community.
+            Rooted in decades of family experience in gemstone trading, the
+            Bhimraj Kamlawati Kothari (BKK) Trust grew from a simple hope: to
+            support local women and children in finding their own strengths and
+            opportunities.
           </p>
         </div>
 
@@ -36,34 +37,44 @@ const OurStory: React.FC = () => {
                 The Kothari Legacy
               </h3>
               <p className="mt-6 text-xl leading-8 text-gray-700">
-                The story of the BKK Trust begins with the storied K.G. Kothari
-                family of Jaipur. A pioneering Marwari businessman, the late
-                Bhimraj Kothari spent a lifetime trading gemstones across Hong
-                Kong, South America, Bangkok, Bombay, and the USA.
+                Hailing from the K.G. Kothari family of Jaipur, Bhimraj Kothari
+                was a pioneering Marwari entrepreneur who spent a lifetime
+                trading gemstones across Hong Kong, South America, Bangkok,
+                Bombay, and the USA.
               </p>
               <p className="mt-8 text-lg text-gray-600">
-                His global journeys shaped a deep understanding of communities
-                and a desire to give back. He and his wife, Kamlawati Kothari,
-                shared a profound vision: to uplift and empower women in their
-                own community, providing them with the tools for a self-reliant
-                and dignified life.
+                Bhimraj and Kamlawati Kothari believed that business success
+                meant little without giving back. Over the years, their work in
+                jewelry markets around the world deepened their respect for the
+                everyday challenges people face—and their conviction that even
+                small efforts can make a real difference.
               </p>
             </div>
           </div>
-          <div className="h-96 w-full rounded-2xl bg-gray-200 object-cover sm:h-[500px] lg:h-auto flex items-center justify-center">
-            <Gem className="h-24 w-24 text-gray-400" />
-            <span className="sr-only">Image placeholder for the founders</span>
-          </div>
+          <figure>
+            <img
+              className="h-96 w-full rounded-2xl bg-gray-200 object-cover object-top sm:h-[500px] lg:h-auto"
+              src="/daddy_work.jpg"
+              alt="Founder Bhimraj Kothari"
+            />
+            <figcaption className="mt-3 text-sm text-center leading-6 text-gray-500">
+              Bhimraj Kothari at his Hong Kong trading office
+            </figcaption>
+          </figure>
         </div>
 
         {/* Vision into Reality */}
         <div className="mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
-          <div className="h-96 w-full rounded-2xl bg-gray-200 object-cover sm:h-[500px] lg:h-auto flex items-center justify-center order-last lg:order-first">
-            <Users className="h-24 w-24 text-gray-400" />
-            <span className="sr-only">
-              Image placeholder for the Trust's work
-            </span>
-          </div>
+          <figure className="order-last lg:order-first">
+            <img
+              className="h-96 w-full rounded-2xl bg-gray-200 object-cover sm:h-[500px] lg:h-auto"
+              src="/maa_daddy_kothari_house.jpg"
+              alt="The Kothari House"
+            />
+            <figcaption className="mt-3 text-sm text-center leading-6 text-gray-500">
+              Left: Bhimraj Kothari, right: Kamlawati Kothari circa 2001
+            </figcaption>
+          </figure>
           <div className="lg:pl-8 lg:pt-4">
             <div className="lg:max-w-lg">
               <p className="text-base font-semibold leading-7 text-amber-600">
@@ -73,17 +84,18 @@ const OurStory: React.FC = () => {
                 A Promise Fulfilled
               </h3>
               <p className="mt-6 text-xl leading-8 text-gray-700">
-                Though Bhimraj ji could not see their dream realized due to ill
-                health, Kamlawati ji resolved to turn their shared vision into a
-                tangible reality. On December 15th, 2010, she founded the BKK
-                Trust.
+                When Bhimraj’s health no longer allowed him to continue,
+                Kamlawati felt a strong pull to honor their shared wish. In
+                December 2010, she founded the Bhimraj Kamlawati Kothari Trust.
               </p>
               <p className="mt-8 text-lg text-gray-600">
-                As Trustee and Director, Kamlawati ji has guided the
-                organization to become a beacon of hope, working for the
-                betterment of women, girls, and young children. Her unwavering
-                commitment and generosity have empowered countless individuals
-                to build a better future.
+                Although their journeys carried them across continents, Bhimraj
+                and Kamlawati always felt a special bond with their hometown of
+                Jaipur. With Kamlawati’s steady guidance, the BKK Trust has
+                returned that love by focusing its efforts right here—listening
+                closely to local women and girls, then offering vocational
+                workshops, small grants, and mentorship that reflect the needs
+                and dreams of our own community.
               </p>
             </div>
           </div>
