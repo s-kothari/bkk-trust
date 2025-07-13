@@ -1,13 +1,27 @@
 import React from "react";
-import { Building, Gem, Users, Target, ImageIcon } from "lucide-react";
+import { Building, Target, ImageIcon } from "lucide-react";
 
 const benefactors = [
-  { name: "Emrusa Ltd.", image: "" },
-  { name: "Universal Gems Hong Kong", image: "" },
-  { name: "KGK", image: "" },
-  { name: "Surana Jewellers", image: "" },
-  { name: "Surana Motors", image: "" },
-  { name: "Benefactor 6", image: "" },
+  { name: "Emrusa Ltd.", image: "", link: "https://www.emrusa.net/" },
+  { name: "Universal Gems Hong Kong", image: "", link: "" },
+  { name: "Modern Group", image: "", link: "" },
+  { name: "Apex Diamonds", image: "", link: "" },
+  {
+    name: "KGK",
+    image: "/logos/KGK_Group_logo.png",
+    link: "https://www.kgkgroup.com/",
+  },
+  {
+    name: "Surana Jewellers",
+    image: "/logos/surana_jewellers.avif",
+    link: "https://www.suranajewellersofjaipur.com/",
+  },
+  { name: "Surana Motors", image: "", link: "" },
+  {
+    name: "KLJ Group",
+    image: "/logos/KJLNEW.png",
+    link: "https://kljgroup.com/",
+  },
 ];
 
 const OurStory: React.FC = () => {
@@ -146,37 +160,54 @@ const OurStory: React.FC = () => {
         <div className="mx-auto mt-16 max-w-7xl sm:mt-24 lg:mt-32">
           <div className="text-center">
             <h3 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Our Supporters
+              Donors
             </h3>
             <p className="mt-4 text-lg text-gray-600">
               We are grateful for the generous support of our partners and
               benefactors who make our work possible.
             </p>
           </div>
-          <div className="mt-12 w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]">
-            <ul className="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-scroll">
-              {benefactors.map((benefactor, index) => (
-                <li key={index}>
-                  <div className="flex h-20 w-40 items-center justify-center rounded-md border border-gray-200 bg-white p-4">
-                    <ImageIcon className="h-12 w-12 text-gray-300" />
-                    <span className="sr-only">{benefactor.name}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <ul
-              className="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-scroll"
-              aria-hidden="true"
-            >
-              {benefactors.map((benefactor, index) => (
-                <li key={index}>
-                  <div className="flex h-20 w-40 items-center justify-center rounded-md border border-ray-200 bg-white p-4">
-                    <ImageIcon className="h-12 w-12 text-gray-300" />
-                    <span className="sr-only">{benefactor.name}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+          <div className="mt-12 grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-4">
+            {benefactors.map((benefactor) =>
+              benefactor.link ? (
+                <a
+                  key={benefactor.name}
+                  href={benefactor.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-24 w-full items-center justify-center border border-gray-200 bg-white p-4 transition-shadow hover:shadow-lg"
+                >
+                  {benefactor.image ? (
+                    <img
+                      src={benefactor.image}
+                      alt={benefactor.name}
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  ) : (
+                    <span className="text-center font-semibold text-gray-700">
+                      {benefactor.name}
+                    </span>
+                  )}
+                </a>
+              ) : (
+                <div
+                  key={benefactor.name}
+                  className="flex h-24 w-full items-center justify-center border border-gray-200 bg-white p-4"
+                >
+                  {benefactor.image ? (
+                    <img
+                      src={benefactor.image}
+                      alt={benefactor.name}
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  ) : (
+                    <span className="text-center font-semibold text-gray-700">
+                      {benefactor.name}
+                    </span>
+                  )}
+                </div>
+              )
+            )}
           </div>
         </div>
       </div>
