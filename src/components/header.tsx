@@ -459,7 +459,8 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                 }}
                 transition={{ duration: 0.3 }}
               >
-                BKK Charitable Trust
+                <span className="hidden sm:inline">BKK Charitable Trust</span>
+                <span className="inline sm:hidden">BKK Trust</span>
               </motion.div>
 
               <div className="hidden md:flex items-center gap-8">
