@@ -78,7 +78,7 @@ const ContactPage: React.FC = () => {
               loading="lazy"
               allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"
-              src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBdkMSVAjgjRMOeQlz1wxPtVaoRXI2417c&q=Bhimraj%20Kamlawati%20Kothari%20Charitable%20Trust%2C%20New%20Sanganer%20Road%2C%20Ward%2027%2C%20Mansarovar%20Sector%208%2C%20Sodala%2C%20Jaipur%2C%20Rajasthan%2C%20India&zoom=15"
+              src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBdkMSVAjgjRMOeQlz1wxPtVaoRXI2417c&q=Bhimraj%20Kamlawati%20Kothari%20Charitable%20Trust%2C%20New%20Sanganer%20Road%2C%20Ward%2027%2C%20Mansarovar%20Sector%208%2C%20Sodala%2C%20Jaipur%2C%20Rajasthan%2C%20India&zoom=10"
             ></iframe>
           </div>
         </div>
