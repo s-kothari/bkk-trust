@@ -4,10 +4,10 @@ import DonationInquiryForm from "./components/DonationInquiryForm";
 
 const DonatePage: React.FC = () => {
   return (
-    <div>
+    <div className="bg-amber-50/50 sm:py-32 py-24">
       {/* Hero Section */}
       <div className="relative">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8 py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 pb-16">
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
               Build Futures with BKK Trust
@@ -31,7 +31,7 @@ const DonatePage: React.FC = () => {
       </div>
 
       {/* Programs Overview Section */}
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 py-24 sm:py-32">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Your Support Can Change Lives
@@ -46,7 +46,7 @@ const DonatePage: React.FC = () => {
 
         <div className="mt-16 grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:gap-x-8">
           {/* Women's Empowerment */}
-          <div className="rounded-2xl p-8 ring-1 ring-inset ring-gray-200">
+          <div className="rounded-2xl p-8 ring-1 ring-inset ring-gray-200 bg-white">
             <h3 className="text-2xl font-bold tracking-tight text-gray-900">
               Empower Women to Learn and Thrive
             </h3>
@@ -63,7 +63,7 @@ const DonatePage: React.FC = () => {
           </div>
 
           {/* Children's Future */}
-          <div className="rounded-2xl p-8 ring-1 ring-inset ring-gray-200">
+          <div className="rounded-2xl p-8 ring-1 ring-inset ring-gray-200 bg-white">
             <h3 className="text-2xl font-bold tracking-tight text-gray-900">
               Invest in the Next Generation
             </h3>
@@ -105,7 +105,7 @@ const DonatePage: React.FC = () => {
             </p>
           </div>
 
-          <div className="mt-16 p-8 rounded-lg shadow-md">
+          <div className="mt-16 p-8 rounded-lg shadow-md bg-white">
             <h3 className="text-2xl font-bold tracking-tight text-gray-900 text-center">
               Bank Transfer Details
             </h3>
@@ -148,7 +148,8 @@ const DonatePage: React.FC = () => {
                 <div className="flex flex-col items-start justify-between py-4 sm:flex-row sm:items-center">
                   <dt className="font-medium text-gray-900">Branch</dt>
                   <dd className="font-medium text-gray-700 sm:text-right">
-                    D-24, Durlabh Niwas, C-Scheme, Jaipur 302001
+                    D-24, Durlabh Niwas, C-Scheme, Jaipur 302001, Rajasthan,
+                    India
                   </dd>
                 </div>
               </dl>
