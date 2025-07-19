@@ -6,17 +6,16 @@ const benefactors = [
   { name: "Universal Gems Hong Kong", image: "", link: "" },
   { name: "Modern Group", image: "", link: "" },
   { name: "Apex Diamonds", image: "", link: "" },
-  {
-    name: "KGK",
-    image: "/logos/KGK_Group_logo.png",
-    link: "https://www.kgkgroup.com/",
-  },
+  // {
+  //   name: "KGK",
+  //   image: "/logos/KGK_Group_logo.png",
+  //   link: "https://www.kgkgroup.com/",
+  // },
   {
     name: "Surana Jewellers",
     image: "/logos/surana_jewellers.avif",
     link: "https://www.suranajewellersofjaipur.com/",
   },
-  { name: "Surana Motors", image: "", link: "" },
   {
     name: "KLJ Group",
     image: "/logos/KJLNEW.png",

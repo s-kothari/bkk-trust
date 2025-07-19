@@ -46,7 +46,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           >
             <X size={32} />
           </button>
-          <nav className="flex flex-col items-center gap-y-6">
+          <nav className="flex flex-col items-center gap-y-6 w-full px-4">
             {headerItems.map((item) => (
               <button
                 key={item.name}
@@ -54,7 +54,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                   handleNavClick(item.linkTo);
                   setMobileMenuOpen(false);
                 }}
-                className="text-amber-100 font-medium text-2xl py-2 hover:text-amber-300 transition-colors duration-200"
+                className="text-amber-100 font-medium text-2xl py-2 hover:text-amber-300 transition-colors duration-200 bg-white/10 w-full rounded-lg"
               >
                 {item.name}
               </button>
@@ -64,7 +64,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 handleNavClick("donate");
                 setMobileMenuOpen(false);
               }}
-              className="mt-6 px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-lg shadow-lg text-xl"
+              className="w-full mt-6 px-8 py-3  bg-white hover:bg-amber-50 text-black font-bold rounded-lg shadow-lg text-xl"
             >
               Donate
             </button>
