@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -10,7 +10,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import "./CommunityMap.css";
 import L from "leaflet";
-import jaipurBoundary from "../data/jaipur-boundary.json";
+// import jaipurBoundary from "../data/Jaipur_Wards.geojson"; - This line will be removed
 
 // Fix for default marker icon issue with webpack
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -26,8 +26,8 @@ const jaipurPosition: [number, number] = [26.9124, 75.7873]; // Jaipur center
 const geoJsonStyle = {
   fillColor: "pink",
   color: "#ff78a0",
-  weight: 2,
-  opacity: 0.6,
+  weight: 1,
+  opacity: 0.2,
   fillOpacity: 0.3,
 };
 
@@ -38,6 +38,22 @@ interface CommunityMapProps {
 const CommunityMap: React.FC<CommunityMapProps> = ({
   backgroundColor = "#f3f4f6",
 }) => {
+  const [geoJsonData, setGeoJsonData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchGeoJson = async () => {
+      try {
+        const response = await fetch("/Jaipur_Wards.geojson");
+        const data = await response.json();
+        setGeoJsonData(data);
+      } catch (error) {
+        console.error("Error fetching GeoJSON data:", error);
+      }
+    };
+
+    fetchGeoJson();
+  }, []);
+
   return (
     <div className="relative h-96 w-full rounded-2xl overflow-hidden shadow-lg">
       <div
@@ -46,7 +62,7 @@ const CommunityMap: React.FC<CommunityMapProps> = ({
       ></div>
       <MapContainer
         center={jaipurPosition}
-        zoom={6}
+        zoom={10}
         scrollWheelZoom={false}
         style={{
           height: "100%",
@@ -59,12 +75,12 @@ const CommunityMap: React.FC<CommunityMapProps> = ({
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
-        <GeoJSON data={jaipurBoundary as any} style={geoJsonStyle} />
+        {geoJsonData && <GeoJSON data={geoJsonData} style={geoJsonStyle} />}
         <Marker position={position}>
           <Tooltip
             permanent
-            direction="right"
-            offset={[10, 0]}
+            direction="left"
+            offset={[-30, 0]}
             opacity={1}
             className="custom-tooltip"
           >

@@ -51,7 +51,7 @@ const ContactPage: React.FC = () => {
                 +91-99289-55508
                 <br />
                 <span className="text-sm text-gray-500">
-                  Ms. Indu Sharma, Manager
+                  Indu Sharma, Manager
                 </span>
               </dd>
             </div>
