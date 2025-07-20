@@ -232,7 +232,7 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
             animate={{
               background:
                 currentStep >= 1
-                  ? "linear-gradient(to bottom, #99bec7 0%, #99bec7 50%, #99bec7 100%)"
+                  ? "#99bec7"
                   : "linear-gradient(to bottom, #0f172a 0%, #1e293b 50%, #334155 100%)",
             }}
             transition={{ duration: 1.5 }}
@@ -349,12 +349,58 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
             <motion.img
               src="/banner.png"
               alt="Banner"
-              className="absolute w-[26rem] object-contain pointer-events-none"
+              className="absolute w-[26rem] object-contain pointer-events-none drop-shadow-lg z-10"
               style={{ top: "-30px" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: currentStep >= 1 ? 1 : 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
             />
+            <div className="absolute inset-x-0 flex justify-center items-center">
+              {/* Left Flag */}
+              <motion.div
+                className="relative"
+                style={{ marginRight: "0px" }}
+                initial={{ scale: 0, opacity: 0, y: 20, rotate: -20 }}
+                animate={{
+                  scale: 1,
+                  opacity: currentStep >= 1 ? 1 : 0,
+                  y: -50,
+                  rotate: -25,
+                }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <img
+                  src="/flag.png"
+                  alt="Indian Flag"
+                  className="-scale-x-100 w-64 h-50 object-contain drop-shadow-lg"
+                />
+              </motion.div>
+
+              {/* Sun spacer - invisible element to maintain spacing */}
+              <div className="w-24 h-24" />
+
+              {/* Right Flag */}
+              <motion.div
+                className="relative"
+                style={{ marginLeft: "0px" }}
+                initial={{ scale: 0, opacity: 0, y: 20, rotate: 20 }}
+                animate={{
+                  scale: 1,
+                  opacity: currentStep >= 1 ? 1 : 0,
+                  y: -50,
+                  rotate: 25,
+                }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                <img
+                  src="/flag.png"
+                  alt="Indian Flag"
+                  className="w-64 h-50 object-contain drop-shadow-lg"
+                />
+              </motion.div>
+            </div>
             {/* Trust Title */}
             {/* <motion.h1
               className="uppercase absolute font-garamond font-bold text-gray-800 text-2xl pointer-events-none"
@@ -372,51 +418,6 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
               {`Bhimraj\n Kamlawati Kothari Trust`}
             </motion.h1> */}
           </motion.div>
-
-          {/* Indian Flags - Centered positioning */}
-          <AnimatePresence>
-            {currentStep >= 1 && !headerCollapsed && (
-              <div
-                className="absolute inset-x-0 flex justify-center items-center"
-                style={{ bottom: currentStep >= 1 ? "50%" : "25%" }}
-              >
-                {/* Left Flag */}
-                <motion.div
-                  className="relative"
-                  style={{ marginRight: "0px" }}
-                  initial={{ scale: 0, opacity: 0, y: 20, rotate: -20 }}
-                  animate={{ scale: 1, opacity: 1, y: 0, rotate: -25 }}
-                  exit={{ scale: 0, opacity: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                >
-                  <img
-                    src="/flag.png"
-                    alt="Indian Flag"
-                    className="-scale-x-100 w-64 h-50 object-contain drop-shadow-lg"
-                  />
-                </motion.div>
-
-                {/* Sun spacer - invisible element to maintain spacing */}
-                <div className="w-24 h-24" />
-
-                {/* Right Flag */}
-                <motion.div
-                  className="relative"
-                  style={{ marginLeft: "0px" }}
-                  initial={{ scale: 0, opacity: 0, y: 20, rotate: 20 }}
-                  animate={{ scale: 1, opacity: 1, y: 0, rotate: 25 }}
-                  exit={{ scale: 0, opacity: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                >
-                  <img
-                    src="/flag.png"
-                    alt="Indian Flag"
-                    className="w-64 h-50 object-contain drop-shadow-lg"
-                  />
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
 
           {/* Scroll indicator */}
           <AnimatePresence>
