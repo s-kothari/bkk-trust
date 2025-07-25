@@ -2,7 +2,11 @@ import React from "react";
 import { Building, Target, ImageIcon } from "lucide-react";
 
 const benefactors = [
-  { name: "Emrusa Ltd.", image: "", link: "https://www.emrusa.net/" },
+  {
+    name: "Emrusa Ltd.",
+    image: "/logos/Emrusa.png",
+    link: "https://www.emrusa.net/",
+  },
   { name: "Universal Gems Hong Kong", image: "", link: "" },
   { name: "Modern Group", image: "", link: "" },
   { name: "Apex Diamonds", image: "", link: "" },

@@ -13,11 +13,9 @@ function Footer() {
   return (
     <footer className="bg-black">
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-          <p className="text-sm text-gray-400 order-2 sm:order-1">
-            {copyright}
-          </p>
-          <div className="flex space-x-6 order-1 sm:order-2">
+        <div className="flex justify-center">
+          <p className="text-sm text-gray-400">{copyright}</p>
+          {/* <div className="flex space-x-6 order-1 sm:order-2">
             {socialItems.map((item) => (
               <a
                 key={item.name}
@@ -27,7 +25,7 @@ function Footer() {
                 {item.name}
               </a>
             ))}
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

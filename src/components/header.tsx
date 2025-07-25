@@ -13,67 +13,137 @@ interface HeaderProps {
   setIsLocked: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+interface HeaderItem {
+  name: string;
+  linkTo: string;
+  subItems?: { name: string; linkTo: string }[];
+}
+
 interface MobileMenuProps {
   isMobileMenuOpen: boolean;
   setMobileMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  headerItems: { name: string; linkTo: string }[];
+  headerItems: HeaderItem[];
   handleNavClick: (section: string) => void;
 }
+
+const totalAnimationDuration = 1000;
+
+const sunContainerVariants = {
+  initial: { bottom: "40%", y: "50%", scale: 1 },
+  risen: {
+    bottom: "60%",
+    y: "0%",
+    scale: 1,
+    transition: { duration: totalAnimationDuration / 1000, ease: "easeOut" },
+  },
+  collapsed: {
+    bottom: "50%",
+    y: "37%",
+    scale: 0.175,
+    transition: { duration: 0.8, ease: "easeOut" },
+  },
+};
 
 const MobileMenu: React.FC<MobileMenuProps> = ({
   isMobileMenuOpen,
   setMobileMenuOpen,
   headerItems,
   handleNavClick,
-}) => (
-  <AnimatePresence>
-    {isMobileMenuOpen && (
-      <motion.div
-        className="fixed inset-0 z-[100] bg-slate-900/90 backdrop-blur-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={() => setMobileMenuOpen(false)}
-      >
-        <div
-          className="flex flex-col items-center justify-center h-full relative"
-          onClick={(e) => e.stopPropagation()}
+}) => {
+  const [openItem, setOpenItem] = useState<string | null>(null);
+
+  return (
+    <AnimatePresence>
+      {isMobileMenuOpen && (
+        <motion.div
+          className="fixed inset-0 z-[100] bg-slate-900/90 backdrop-blur-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setMobileMenuOpen(false)}
         >
-          <button
-            onClick={() => setMobileMenuOpen(false)}
-            className="absolute top-6 right-6 text-white"
-            aria-label="Close menu"
+          <div
+            className="flex flex-col items-center justify-center h-full relative"
+            onClick={(e) => e.stopPropagation()}
           >
-            <X size={32} />
-          </button>
-          <nav className="flex flex-col items-center gap-y-6 w-full px-4">
-            {headerItems.map((item) => (
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="absolute top-6 right-6 text-white"
+              aria-label="Close menu"
+            >
+              <X size={32} />
+            </button>
+            <nav className="flex flex-col items-center gap-y-6 w-full px-4">
+              {headerItems.map((item) =>
+                item.subItems ? (
+                  <div key={item.name} className="w-full">
+                    <button
+                      onClick={() =>
+                        setOpenItem(openItem === item.name ? null : item.name)
+                      }
+                      className="text-amber-100 font-medium text-2xl py-2 bg-white/10 w-full rounded-lg flex justify-center items-center gap-2"
+                    >
+                      {item.name}
+                      <ChevronDown
+                        size={24}
+                        className={`transition-transform ${
+                          openItem === item.name ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                    <AnimatePresence>
+                      {openItem === item.name && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="flex flex-col items-center gap-y-2 w-full pl-4 mt-2"
+                        >
+                          {item.subItems.map((subItem) => (
+                            <button
+                              key={subItem.name}
+                              onClick={() => {
+                                handleNavClick(subItem.linkTo);
+                                setMobileMenuOpen(false);
+                              }}
+                              className="text-amber-100 font-medium text-xl py-2 hover:text-amber-300 transition-colors duration-200 bg-white/5 w-full rounded-lg"
+                            >
+                              {subItem.name}
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ) : (
+                  <button
+                    key={item.name}
+                    onClick={() => {
+                      handleNavClick(item.linkTo);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="text-amber-100 font-medium text-2xl py-2 hover:text-amber-300 transition-colors duration-200 bg-white/10 w-full rounded-lg"
+                  >
+                    {item.name}
+                  </button>
+                )
+              )}
               <button
-                key={item.name}
                 onClick={() => {
-                  handleNavClick(item.linkTo);
+                  handleNavClick("donate");
                   setMobileMenuOpen(false);
                 }}
-                className="text-amber-100 font-medium text-2xl py-2 hover:text-amber-300 transition-colors duration-200 bg-white/10 w-full rounded-lg"
+                className="w-full mt-6 px-8 py-3  bg-white hover:bg-amber-50 text-black font-bold rounded-lg shadow-lg text-xl"
               >
-                {item.name}
+                Donate
               </button>
-            ))}
-            <button
-              onClick={() => {
-                handleNavClick("donate");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full mt-6 px-8 py-3  bg-white hover:bg-amber-50 text-black font-bold rounded-lg shadow-lg text-xl"
-            >
-              Donate
-            </button>
-          </nav>
-        </div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-);
+            </nav>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
   const { scrollY } = useScroll();
@@ -85,105 +155,72 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentStep, setCurrentStep] = useState(0); // 0: start, 1: animated, 2: collapsed
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSunRisen, setIsSunRisen] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const isHomePage = location.pathname === "/";
   const isLightBg = currentStep >= 1;
 
-  // Set header state based on page
+  // Set header state based on page and trigger auto-animation
   useEffect(() => {
+    // Cleanup previous timeouts
+    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+
     if (!isHomePage) {
       setHeaderCollapsed(true);
       setHasScrolled(true);
       setCurrentStep(2);
       setIsLocked(true);
       setAnimationProgress(1);
+      setIsSunRisen(true);
     } else {
-      // Reset state when navigating back to home page
+      // Reset state for home page
       setHeaderCollapsed(false);
-      setHasScrolled(false);
-      setCurrentStep(0);
+      setHasScrolled(true);
+      setCurrentStep(1);
       setIsLocked(false);
-      setAnimationProgress(0);
+      setAnimationProgress(1);
+      setIsAnimating(false);
+      setIsSunRisen(true);
     }
+
+    return () => {
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      if (animationTimeoutRef.current)
+        clearTimeout(animationTimeoutRef.current);
+    };
   }, [isHomePage, setIsLocked]);
 
   // Define scroll thresholds for each step
   const SCROLL_THRESHOLDS = {
-    START: 0,
-    ANIMATED: 300,
-    COLLAPSED: 600,
+    COLLAPSED: 100, // Scroll down 100px to collapse
   };
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (isAnimating || !isHomePage) return;
 
-    // Determine which step we should be in based on scroll position
-    let targetStep;
-    if (latest >= SCROLL_THRESHOLDS.COLLAPSED) {
-      targetStep = 2;
-    } else if (latest >= SCROLL_THRESHOLDS.ANIMATED) {
-      targetStep = 1;
-    } else {
-      // If we've already been past the initial state, don't go back to it on scroll up.
-      // Stay at the fully animated state.
-      if (hasScrolled) {
-        targetStep = 1;
-      } else {
-        targetStep = 0;
-      }
-    }
-
-    // If we need to change steps, trigger the animation
-    if (targetStep !== currentStep) {
-      setIsAnimating(true);
-      setCurrentStep(targetStep);
-
-      // Clear any existing timeout
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-
-      // Set animation progress based on target step
-      if (targetStep === 0) {
-        setAnimationProgress(0);
-        setHeaderCollapsed(false);
-        setHasScrolled(false);
-      } else if (targetStep === 1) {
-        setAnimationProgress(1);
-        setHeaderCollapsed(false);
-        setHasScrolled(true);
-        setIsLocked(false); // Unlock for content interaction
-      } else if (targetStep === 2) {
-        setAnimationProgress(1);
+    if (latest > SCROLL_THRESHOLDS.COLLAPSED) {
+      if (!headerCollapsed) {
         setHeaderCollapsed(true);
-        setHasScrolled(true);
-        setIsLocked(true); // Lock the header
+        setIsLocked(true);
+        setCurrentStep(2);
       }
-
-      // Allow animation to complete before allowing further scroll changes
-      scrollTimeoutRef.current = setTimeout(() => {
-        setIsAnimating(false);
-      }, 1000); // Match the longest animation duration
+    } else {
+      if (headerCollapsed) {
+        setHeaderCollapsed(false);
+        setIsLocked(false);
+        setCurrentStep(1);
+      }
     }
   });
 
   const handleScrollDown = () => {
     if (isAnimating) return;
-
-    if (currentStep === 0) {
-      window.scrollTo({
-        top: SCROLL_THRESHOLDS.COLLAPSED,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  const handleScrollToTop = () => {
-    if (isAnimating) return;
-    // If locked, this will scroll to the top of the content.
-    // Otherwise, it scrolls to the top of the animation.
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setHeaderCollapsed(true);
+    setIsLocked(true);
+    setCurrentStep(2);
   };
 
   const handleNavClick = (section: string) => {
@@ -191,9 +228,16 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
     navigate(`/${section}`);
   };
 
-  const headerItems = [
+  const headerItems: HeaderItem[] = [
     { name: "Our Story", linkTo: "about" },
-    { name: "Impact", linkTo: "impact" },
+    {
+      name: "Impact",
+      linkTo: "impact",
+      subItems: [
+        { name: "Children's Programs", linkTo: "impact/children" },
+        { name: "Women's Programs", linkTo: "impact/women" },
+      ],
+    },
     { name: "Contact", linkTo: "contact" },
   ];
 
@@ -202,6 +246,9 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
     return () => {
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
+      }
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
       }
     };
   }, []);
@@ -221,21 +268,26 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
         transition={{ duration: 0.6, ease: "easeInOut" }}
       >
         {/* Main container with gradient background */}
-        <div className="relative w-full h-full overflow-hidden">
-          {/* Sky gradient background */}
+        <div
+          className={`relative w-full h-full ${
+            headerCollapsed ? "overflow-visible" : "overflow-hidden"
+          }`}
+        >
+          {/* Sky gradient background - Night Sky */}
           <motion.div
             className="absolute inset-0"
-            initial={{
+            style={{
               background:
                 "linear-gradient(to bottom, #0f172a 0%, #1e293b 50%, #334155 100%)",
             }}
-            animate={{
-              background:
-                currentStep >= 1
-                  ? "#99bec7"
-                  : "linear-gradient(to bottom, #0f172a 0%, #1e293b 50%, #334155 100%)",
-            }}
-            transition={{ duration: 1.5 }}
+          />
+          {/* Day Sky - fades in */}
+          <motion.div
+            className="absolute inset-0"
+            style={{ backgroundColor: "#99bec7" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: currentStep >= 1 ? 1 : 0 }}
+            transition={{ duration: totalAnimationDuration / 1000 }}
           />
 
           {/* Horizon line */}
@@ -252,17 +304,16 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
           {/* Sun container */}
           <motion.div
             className="absolute  inset-x-0 flex justify-center z-10"
-            initial={{ bottom: "40%", y: "50%" }}
-            animate={{
-              bottom: headerCollapsed
-                ? "50%"
+            variants={sunContainerVariants}
+            initial="initial"
+            animate={
+              headerCollapsed
+                ? "collapsed"
                 : currentStep >= 1
-                ? "60%"
-                : "40%",
-              scale: headerCollapsed ? 0.175 : 1,
-              y: headerCollapsed ? "37%" : currentStep >= 1 ? "0%" : "50%",
-            }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+                ? "risen"
+                : "initial"
+            }
+            onClick={() => handleNavClick("")}
           >
             <div className="relative w-24 h-24">
               {/* Sun rays - behind the sun */}
@@ -287,8 +338,8 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                       }}
                       initial={{ scaleY: 0, opacity: 0 }}
                       animate={{
-                        scaleY: currentStep >= 1 ? 1 : 0,
-                        opacity: currentStep >= 1 ? 1 : 0,
+                        scaleY: isSunRisen ? 1 : 0,
+                        opacity: isSunRisen ? 1 : 0,
                       }}
                       transition={{
                         delay: i * 0.03,
@@ -340,7 +391,7 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                 alt="Sun face"
                 className="absolute inset-0 w-full h-full object-contain z-20"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: currentStep >= 1 ? 1 : 0 }}
+                animate={{ opacity: isSunRisen ? 1 : 0 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
               />
             </div>
@@ -352,18 +403,19 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
               className="absolute w-[26rem] object-contain pointer-events-none drop-shadow-lg z-10"
               style={{ top: "-30px" }}
               initial={{ opacity: 0 }}
-              animate={{ opacity: currentStep >= 1 ? 1 : 0 }}
+              animate={{ opacity: isSunRisen ? 1 : 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
+              onClick={() => handleNavClick("/")}
             />
-            <div className="absolute inset-x-0 flex justify-center items-center">
+            <div className="absolute inset-x-0 flex justify-center items-center hover:cursor-pointer">
               {/* Left Flag */}
               <motion.div
                 className="relative"
                 style={{ marginRight: "0px" }}
                 initial={{ scale: 0, opacity: 0, y: 20, rotate: -20 }}
                 animate={{
-                  scale: 1,
-                  opacity: currentStep >= 1 ? 1 : 0,
+                  scale: isSunRisen ? 1 : 0,
+                  opacity: isSunRisen ? 1 : 0,
                   y: -50,
                   rotate: -25,
                 }}
@@ -386,8 +438,8 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                 style={{ marginLeft: "0px" }}
                 initial={{ scale: 0, opacity: 0, y: 20, rotate: 20 }}
                 animate={{
-                  scale: 1,
-                  opacity: currentStep >= 1 ? 1 : 0,
+                  scale: isSunRisen ? 1 : 0,
+                  opacity: isSunRisen ? 1 : 0,
                   y: -50,
                   rotate: 25,
                 }}
@@ -421,19 +473,19 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
 
           {/* Scroll indicator */}
           <AnimatePresence>
-            {currentStep === 0 && !headerCollapsed && (
+            {currentStep === 1 && !headerCollapsed && (
               <div className="absolute bottom-20 inset-x-0 flex justify-center z-30">
                 <motion.button
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ duration: 0.5 }}
+                  exit={{ opacity: 0, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0 }}
                   onClick={handleScrollDown}
                 >
                   <motion.div
                     animate={{ y: [0, 10, 0] }}
                     transition={{ repeat: Infinity, duration: 2 }}
-                    className="text-amber-200 hover:text-amber-100 transition-colors cursor-pointer"
+                    className="text-gray-800 hover:text-black transition-colors cursor-pointer"
                   >
                     <ChevronDown size={40} strokeWidth={1.5} />
                   </motion.div>
@@ -451,7 +503,7 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
           >
             <div className="flex items-center justify-between px-4 sm:px-8 py-4">
               <motion.div
-                className="font-bold text-lg cursor-pointer font-didact"
+                className="font-bold text-base cursor-pointer uppercase"
                 onClick={() => handleNavClick("")}
                 animate={{
                   opacity: headerCollapsed ? 1 : 0,
@@ -475,7 +527,7 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                   >
                     <motion.button
                       onClick={() => handleNavClick(item.linkTo)}
-                      className="font-medium transition-colors duration-200"
+                      className="font-medium transition-colors duration-200 flex items-center gap-1"
                       animate={{
                         color: isLightBg ? "#2d2d2d" : "#fef3c7",
                       }}
@@ -484,6 +536,7 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                       }}
                     >
                       {item.name}
+                      {item.subItems && <ChevronDown size={16} />}
                     </motion.button>
                     <motion.div
                       className="absolute bottom-[-5px] left-0 w-full h-[2px]"
@@ -496,6 +549,37 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                       }}
                       transition={{ duration: 0.3 }}
                     />
+                    {item.subItems && (
+                      <motion.div
+                        className="absolute top-full  mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-50"
+                        variants={{
+                          rest: {
+                            opacity: 0,
+                            y: -10,
+                            pointerEvents: "none",
+                          },
+                          hover: {
+                            opacity: 1,
+                            y: 0,
+                            pointerEvents: "auto",
+                          },
+                        }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                      >
+                        <ul className="py-1">
+                          {item.subItems.map((subItem) => (
+                            <li key={subItem.name}>
+                              <button
+                                onClick={() => handleNavClick(subItem.linkTo)}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                {subItem.name}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </motion.div>
+                    )}
                   </motion.div>
                 ))}
                 <motion.button

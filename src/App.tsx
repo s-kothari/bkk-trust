@@ -17,13 +17,11 @@ const AppContent = () => {
   const location = useLocation();
   const isHomePage = location.pathname === "/";
 
-  const shouldHavePadding = !isHomePage || isHeaderLocked;
-
   return (
     <>
       <Header isLocked={isHeaderLocked} setIsLocked={setIsHeaderLocked} />
       <main
-        style={{ paddingTop: shouldHavePadding ? "80px" : "0px" }}
+        style={{ paddingTop: isHomePage ? "0vh" : "80px" }}
         className="bg-amber-50/50"
       >
         <Routes>
