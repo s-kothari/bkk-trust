@@ -22,7 +22,7 @@ const AppContent = () => {
       <Header isLocked={isHeaderLocked} setIsLocked={setIsHeaderLocked} />
       <main
         style={{ paddingTop: isHomePage ? "0vh" : "80px" }}
-        className="bg-amber-50/50"
+        className="#fbfbec"
       >
         <Routes>
           <Route path="/" element={<HomePage isLocked={isHeaderLocked} />} />

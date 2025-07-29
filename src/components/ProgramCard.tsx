@@ -11,7 +11,7 @@ interface ProgramCardProps {
 
 const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg shadow-lg">
+    <div className="flex flex-col h-full overflow-hidden rounded-lg shadow-lg">
       {program.image && (
         <div className="flex-shrink-0">
           <img
