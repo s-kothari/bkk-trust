@@ -26,7 +26,7 @@ interface MobileMenuProps {
   handleNavClick: (section: string) => void;
 }
 
-const totalAnimationDuration = 1000;
+const totalAnimationDuration = 2000;
 
 const sunContainerVariants = {
   initial: { bottom: "40%", y: "50%", scale: 1 },
@@ -315,6 +315,58 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
             }
             onClick={() => handleNavClick("")}
           >
+            <div className="absolute inset-x-0 flex justify-center items-center hover:cursor-pointer z-0">
+              {/* Left Flag */}
+              <motion.div
+                className="relative flex-shrink-0"
+                style={{ marginRight: "0px" }}
+                initial={{ scale: 0, opacity: 0, y: 20, rotate: -20 }}
+                animate={{
+                  scale: isSunRisen ? 1 : 0,
+                  opacity: isSunRisen ? 1 : 0,
+                  y: -50,
+                  rotate: -25,
+                }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{
+                  duration: 0.6,
+                  delay: totalAnimationDuration / 1000 + 0.2,
+                }}
+              >
+                <img
+                  src="/flag_4.png"
+                  alt="Indian Flag"
+                  className="-scale-x-100 w-64 h-50 object-contain drop-shadow-lg"
+                />
+              </motion.div>
+
+              {/* Sun spacer - invisible element to maintain spacing */}
+              <div className="w-24 h-24" />
+
+              {/* Right Flag */}
+              <motion.div
+                className="relative flex-shrink-0"
+                style={{ marginLeft: "0px" }}
+                initial={{ scale: 0, opacity: 0, y: 20, rotate: 20 }}
+                animate={{
+                  scale: isSunRisen ? 1 : 0,
+                  opacity: isSunRisen ? 1 : 0,
+                  y: -50,
+                  rotate: 25,
+                }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{
+                  duration: 0.6,
+                  delay: totalAnimationDuration / 1000 + 0.3,
+                }}
+              >
+                <img
+                  src="/flag_4.png"
+                  alt="Indian Flag"
+                  className="w-64 h-50 object-contain drop-shadow-lg"
+                />
+              </motion.div>
+            </div>
             <div className="relative w-24 h-24">
               {/* Sun rays - behind the sun */}
               <div className="absolute inset-0 flex items-center justify-center ">
@@ -342,45 +394,79 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                         opacity: isSunRisen ? 1 : 0,
                       }}
                       transition={{
-                        delay: i * 0.03,
+                        delay: totalAnimationDuration / 1000 + i * 0.03,
                         duration: 0.5,
                         ease: "easeOut",
                       }}
                     >
                       <div
-                        className="w-0 h-0"
                         style={{
-                          borderLeft: "15px solid transparent",
-                          borderRight: "15px solid transparent",
-                          borderBottom: "120px solid #fbbf24",
-                          filter:
-                            "drop-shadow(0 0 4px rgba(251, 191, 36, 0.5))",
-                          marginLeft: "-15px",
+                          position: "relative",
+                          width: "32px",
+                          height: "124px",
+                          marginLeft: "-16px",
                         }}
-                      />
+                      >
+                        {/* Outline for the sun ray */}
+                        <div
+                          className="absolute top-0 left-0 w-0 h-0"
+                          style={{
+                            borderLeft: "16px solid transparent",
+                            borderRight: "16px solid transparent",
+                            borderBottom: "124px solid black",
+                          }}
+                        />
+                        {/* Sun ray */}
+                        <div
+                          className="absolute top-[4px] left-[2px] w-0 h-0"
+                          style={{
+                            borderLeft: "14px solid transparent",
+                            borderRight: "14px solid transparent",
+                            borderBottom: "120px solid #fbbf24",
+                          }}
+                        />
+                      </div>
                     </motion.div>
                   </div>
                 ))}
               </div>
+
+              {/* Un-animated Sun */}
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: "#fde68a",
+                  boxShadow:
+                    "0 0 40px rgba(251, 191, 36, 0.5), 0 0 5px rgba(0, 0, 0, 0.5)",
+                  transform: "scale(0.90)",
+                  opacity: 0.7,
+                }}
+              />
 
               {/* Sun core - in front of rays */}
               <motion.div
                 className="absolute inset-0 z-10 rounded-full"
                 initial={{
                   scale: 0.8,
-                  opacity: 0.7,
+                  opacity: 0.9,
                   background: "#fde68a",
                   boxShadow:
                     "0 0 40px rgba(251, 191, 36, 0.5), 0 0 5px rgba(0, 0, 0, 0.5)",
+                  borderWidth: "2px",
+                  borderStyle: "solid",
+                  borderColor: "#f59e0b",
                 }}
                 animate={{
                   scale: currentStep >= 1 ? 1 : 0.8,
-                  opacity: 1,
+                  opacity: currentStep >= 1 ? 1 : 0,
                   background: currentStep >= 1 ? "#fbbf24" : "#fde68a",
                   boxShadow:
                     currentStep >= 1
-                      ? "0 0 60px rgba(251, 191, 36, 0.8), 0 0 8px rgba(0, 0, 0, 0.6)"
+                      ? ""
                       : "0 0 40px rgba(251, 191, 36, 0.5), 0 0 5px rgba(0, 0, 0, 0.5)",
+                  borderWidth: "1px",
+                  borderStyle: "solid",
+                  borderColor: currentStep >= 1 ? "black" : "#f59e0b",
                 }}
                 transition={{ duration: 0.8 }}
               />
@@ -389,70 +475,30 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
               <motion.img
                 src="/sun_face.png"
                 alt="Sun face"
-                className="absolute inset-0 w-full h-full object-contain z-20"
+                className="absolute inset-0 w-full p-[2px] h-full object-contain z-20"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: isSunRisen ? 1 : 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
+                transition={{
+                  duration: 0.8,
+                  delay: totalAnimationDuration / 1000 + 0.3,
+                }}
               />
             </div>
 
             {/* Banner image */}
             <motion.img
-              src="/banner.png"
+              src="/banner_6.png"
               alt="Banner"
               className="absolute w-[26rem] object-contain pointer-events-none drop-shadow-lg z-10"
               style={{ top: "-30px" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: isSunRisen ? 1 : 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+              transition={{
+                duration: 0.8,
+                delay: totalAnimationDuration / 1000 + 0.3,
+              }}
               onClick={() => handleNavClick("/")}
             />
-            <div className="absolute inset-x-0 flex justify-center items-center hover:cursor-pointer">
-              {/* Left Flag */}
-              <motion.div
-                className="relative"
-                style={{ marginRight: "0px" }}
-                initial={{ scale: 0, opacity: 0, y: 20, rotate: -20 }}
-                animate={{
-                  scale: isSunRisen ? 1 : 0,
-                  opacity: isSunRisen ? 1 : 0,
-                  y: -50,
-                  rotate: -25,
-                }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <img
-                  src="/flag.png"
-                  alt="Indian Flag"
-                  className="-scale-x-100 w-64 h-50 object-contain drop-shadow-lg"
-                />
-              </motion.div>
-
-              {/* Sun spacer - invisible element to maintain spacing */}
-              <div className="w-24 h-24" />
-
-              {/* Right Flag */}
-              <motion.div
-                className="relative"
-                style={{ marginLeft: "0px" }}
-                initial={{ scale: 0, opacity: 0, y: 20, rotate: 20 }}
-                animate={{
-                  scale: isSunRisen ? 1 : 0,
-                  opacity: isSunRisen ? 1 : 0,
-                  y: -50,
-                  rotate: 25,
-                }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                <img
-                  src="/flag.png"
-                  alt="Indian Flag"
-                  className="w-64 h-50 object-contain drop-shadow-lg"
-                />
-              </motion.div>
-            </div>
             {/* Trust Title */}
             {/* <motion.h1
               className="uppercase absolute font-garamond font-bold text-gray-800 text-2xl pointer-events-none"
