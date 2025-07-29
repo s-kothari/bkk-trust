@@ -563,71 +563,78 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
               </motion.div>
 
               <div className="hidden md:flex items-center gap-8">
-                {headerItems.map((item) => (
-                  <motion.div
-                    key={item.name}
-                    className="relative"
-                    whileHover="hover"
-                    animate="rest"
-                    initial="rest"
-                  >
-                    <motion.button
-                      onClick={() => handleNavClick(item.linkTo)}
-                      className="font-medium transition-colors duration-200 flex items-center gap-1"
-                      animate={{
-                        color: isLightBg ? "#2d2d2d" : "#fef3c7",
-                      }}
-                      variants={{
-                        hover: { color: isLightBg ? "#000000" : "#ffffff" },
-                      }}
-                    >
-                      {item.name}
-                      {item.subItems && <ChevronDown size={16} />}
-                    </motion.button>
+                {headerItems.map((item) => {
+                  const isActive = item.subItems
+                    ? location.pathname.startsWith(`/${item.linkTo}`)
+                    : location.pathname === `/${item.linkTo}`;
+
+                  return (
                     <motion.div
-                      className="absolute bottom-[-5px] left-0 w-full h-[2px]"
-                      style={{
-                        backgroundColor: isLightBg ? "#000000" : "#ffffff",
-                      }}
-                      variants={{
-                        hover: { scaleX: 1 },
-                        rest: { scaleX: 0 },
-                      }}
-                      transition={{ duration: 0.3 }}
-                    />
-                    {item.subItems && (
-                      <motion.div
-                        className="absolute top-full  mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-50"
-                        variants={{
-                          rest: {
-                            opacity: 0,
-                            y: -10,
-                            pointerEvents: "none",
-                          },
-                          hover: {
-                            opacity: 1,
-                            y: 0,
-                            pointerEvents: "auto",
-                          },
+                      key={item.name}
+                      className="relative"
+                      whileHover="hover"
+                      animate="rest"
+                      initial="rest"
+                    >
+                      <motion.button
+                        onClick={() => handleNavClick(item.linkTo)}
+                        className="font-medium transition-colors duration-200 flex items-center gap-1"
+                        animate={{
+                          color: isLightBg ? "#2d2d2d" : "#fef3c7",
                         }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        variants={{
+                          hover: { color: isLightBg ? "#000000" : "#ffffff" },
+                        }}
                       >
-                        <ul className="py-1">
-                          {item.subItems.map((subItem) => (
-                            <li key={subItem.name}>
-                              <button
-                                onClick={() => handleNavClick(subItem.linkTo)}
-                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              >
-                                {subItem.name}
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </motion.div>
-                    )}
-                  </motion.div>
-                ))}
+                        {item.name}
+                        {item.subItems && <ChevronDown size={16} />}
+                      </motion.button>
+                      <motion.div
+                        className="absolute bottom-[-5px] left-0 w-full h-[2px]"
+                        style={{
+                          backgroundColor: isLightBg ? "#000000" : "#ffffff",
+                        }}
+                        variants={{
+                          hover: { scaleX: 1 },
+                          rest: { scaleX: 0 },
+                        }}
+                        animate={isActive ? "hover" : "rest"}
+                        transition={{ duration: 0.3 }}
+                      />
+                      {item.subItems && (
+                        <motion.div
+                          className="absolute top-full  mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-50"
+                          variants={{
+                            rest: {
+                              opacity: 0,
+                              y: -10,
+                              pointerEvents: "none",
+                            },
+                            hover: {
+                              opacity: 1,
+                              y: 0,
+                              pointerEvents: "auto",
+                            },
+                          }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                        >
+                          <ul className="py-1">
+                            {item.subItems.map((subItem) => (
+                              <li key={subItem.name}>
+                                <button
+                                  onClick={() => handleNavClick(subItem.linkTo)}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
+                                  {subItem.name}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  );
+                })}
                 <motion.button
                   onClick={() => handleNavClick("donate")}
                   className="px-6 py-2 font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
