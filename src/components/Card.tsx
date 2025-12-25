@@ -6,6 +6,8 @@
 //     {name: "Learning", linkTo: ""},
 //     {name: "Life", linkTo: ""}
 // ]
+import Image from "next/image";
+
 interface CardProps {
   title: string;
   subtext: string;
@@ -25,11 +27,15 @@ function Card(props: CardProps) {
       style={{ borderColor: props.color }}
     >
       {/* <Card></Card> */}
-      <img
-        src={props.image}
-        alt={props.title}
-        className="object-cover w-80 h-48"
-      ></img>
+      <div className="relative w-80 h-48">
+        <Image
+          src={props.image}
+          alt={props.title}
+          fill
+          sizes="320px"
+          className="object-cover"
+        />
+      </div>
       <div className="mx-3 my-1 flex flex-col ">
         <span>
           <a className="text-lg text-black" href={props.url}>

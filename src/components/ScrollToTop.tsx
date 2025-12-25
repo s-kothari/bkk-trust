@@ -1,11 +1,18 @@
+"use client";
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useReducedMotion } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const pathname = usePathname();
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (prefersReducedMotion) {
+      window.scrollTo(0, 0);
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
   }, [pathname]);
 
   return null;

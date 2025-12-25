@@ -23,9 +23,9 @@ const ContactPage: React.FC = () => {
               Get in Touch
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
-              We'd love to hear from you. Whether you have a question, a
-              suggestion, or want to learn more about our work, please don't
-              hesitate to reach out.
+              We&apos;d love to hear from you. Whether you have a question, a
+              suggestion, or want to learn more about our work, please
+              don&apos;t hesitate to reach out.
             </p>
           </div>
           <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:mt-20 lg:mt-24 lg:max-w-none lg:grid-cols-2">

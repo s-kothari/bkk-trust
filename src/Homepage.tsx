@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import Footer from "./components/footer";
 import Hero from "./components/Hero";
 import ProgramCard from "./components/ProgramCard";

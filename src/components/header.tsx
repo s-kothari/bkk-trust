@@ -1,12 +1,15 @@
+"use client";
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import {
   motion,
   useScroll,
   useMotionValueEvent,
   AnimatePresence,
+  useReducedMotion,
 } from "framer-motion";
 import { ChevronDown, Menu, X } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { usePathname, useRouter } from "next/navigation";
 
 interface HeaderProps {
   isLocked: boolean;
@@ -38,8 +41,8 @@ const sunContainerVariants = {
   },
   collapsed: {
     bottom: "50%",
-    y: "37%",
-    scale: 0.175,
+    y: "42%",
+    scale: 0.15,
     transition: { duration: 0.8, ease: "easeOut" },
   },
 };
@@ -147,8 +150,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 
 const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
   const { scrollY } = useScroll();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const pathname = usePathname();
   const [headerCollapsed, setHeaderCollapsed] = useState(false);
   const [animationProgress, setAnimationProgress] = useState(0);
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -158,8 +161,10 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
   const [isSunRisen, setIsSunRisen] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const tickingRef = useRef(false);
+  const prefersReducedMotion = useReducedMotion();
 
-  const isHomePage = location.pathname === "/";
+  const isHomePage = pathname === "/";
   const isLightBg = currentStep >= 1;
 
   // Set header state based on page and trigger auto-animation
@@ -193,27 +198,35 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
     };
   }, [isHomePage, setIsLocked]);
 
-  // Define scroll thresholds for each step
+  // Define scroll thresholds with hysteresis to avoid flicker
   const SCROLL_THRESHOLDS = {
-    COLLAPSED: 100, // Scroll down 100px to collapse
-  };
+    COLLAPSE_AT: 120,
+    EXPAND_AT: 60,
+  } as const;
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (isAnimating || !isHomePage) return;
+    if (tickingRef.current) return;
+    tickingRef.current = true;
+    requestAnimationFrame(() => {
+      const shouldCollapse = latest > SCROLL_THRESHOLDS.COLLAPSE_AT;
+      const shouldExpand = latest < SCROLL_THRESHOLDS.EXPAND_AT;
 
-    if (latest > SCROLL_THRESHOLDS.COLLAPSED) {
-      if (!headerCollapsed) {
-        setHeaderCollapsed(true);
-        setIsLocked(true);
-        setCurrentStep(2);
-      }
-    } else {
-      if (headerCollapsed) {
-        setHeaderCollapsed(false);
-        setIsLocked(false);
-        setCurrentStep(1);
-      }
-    }
+      setHeaderCollapsed((wasCollapsed) => {
+        if (!wasCollapsed && shouldCollapse) {
+          setIsLocked(true);
+          setCurrentStep(2);
+          return true;
+        }
+        if (wasCollapsed && shouldExpand) {
+          setIsLocked(false);
+          setCurrentStep(1);
+          return false;
+        }
+        return wasCollapsed;
+      });
+      tickingRef.current = false;
+    });
   });
 
   const handleScrollDown = () => {
@@ -224,8 +237,8 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
   };
 
   const handleNavClick = (section: string) => {
-    // Navigate to the respective page
-    navigate(`/${section}`);
+    const normalizedPath = section.startsWith("/") ? section : `/${section}`;
+    router.push(normalizedPath);
   };
 
   const headerItems: HeaderItem[] = [
@@ -252,6 +265,42 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
       }
     };
   }, []);
+
+  // Respect reduced motion by avoiding long chained animations
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setIsSunRisen(true);
+      setHeaderCollapsed(true);
+      setIsLocked(true);
+      setCurrentStep(2);
+    }
+  }, [prefersReducedMotion, setIsLocked]);
+
+  // Prevent background scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
+
+  // Close mobile menu on Escape and on route change
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (isMobileMenuOpen) setMobileMenuOpen(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
     <>
@@ -313,6 +362,7 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                 ? "risen"
                 : "initial"
             }
+            style={{ pointerEvents: headerCollapsed ? "none" : "auto" }}
             onClick={() => handleNavClick("")}
           >
             <div className="absolute inset-x-0 flex justify-center items-center hover:cursor-pointer z-0">
@@ -333,11 +383,15 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                   delay: totalAnimationDuration / 1000 + 0.2,
                 }}
               >
-                <img
-                  src="/flag_4.png"
-                  alt="Indian Flag"
-                  className="-scale-x-100 w-64 h-50 object-contain drop-shadow-lg"
-                />
+                <div className="relative w-64 h-[12.5rem]">
+                  <Image
+                    src="/flag_4.png"
+                    alt="Indian Flag"
+                    fill
+                    sizes="256px"
+                    className="-scale-x-100 object-contain drop-shadow-lg"
+                  />
+                </div>
               </motion.div>
 
               {/* Sun spacer - invisible element to maintain spacing */}
@@ -360,11 +414,15 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                   delay: totalAnimationDuration / 1000 + 0.3,
                 }}
               >
-                <img
-                  src="/flag_4.png"
-                  alt="Indian Flag"
-                  className="w-64 h-50 object-contain drop-shadow-lg"
-                />
+                <div className="relative w-64 h-[12.5rem]">
+                  <Image
+                    src="/flag_4.png"
+                    alt="Indian Flag"
+                    fill
+                    sizes="256px"
+                    className="object-contain drop-shadow-lg"
+                  />
+                </div>
               </motion.div>
             </div>
             <div className="relative w-24 h-24">
@@ -489,7 +547,7 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
             <motion.img
               src="/banner_6.png"
               alt="Banner"
-              className="absolute w-[26rem] object-contain pointer-events-none drop-shadow-lg z-10"
+              className="absolute w-[26rem] object-contain drop-shadow-lg z-10 cursor-pointer"
               style={{ top: "-30px" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: isSunRisen ? 1 : 0 }}
@@ -497,7 +555,16 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                 duration: 0.8,
                 delay: totalAnimationDuration / 1000 + 0.3,
               }}
-              onClick={() => handleNavClick("/")}
+              onClick={() => handleNavClick("")}
+              role="link"
+              aria-label="Go to home"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleNavClick("");
+                }
+              }}
             />
             {/* Trust Title */}
             {/* <motion.h1
@@ -547,7 +614,7 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <div className="flex items-center justify-between px-4 sm:px-8 py-4">
+            <div className="flex items-center justify-between px-4 sm:px-8 py-5">
               <motion.div
                 className="font-bold text-base cursor-pointer uppercase"
                 onClick={() => handleNavClick("")}
@@ -565,8 +632,8 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
               <div className="hidden md:flex items-center gap-8">
                 {headerItems.map((item) => {
                   const isActive = item.subItems
-                    ? location.pathname.startsWith(`/${item.linkTo}`)
-                    : location.pathname === `/${item.linkTo}`;
+                    ? pathname.startsWith(`/${item.linkTo}`)
+                    : pathname === `/${item.linkTo}`;
 
                   return (
                     <motion.div

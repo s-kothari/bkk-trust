@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import {
   MapContainer,
@@ -7,7 +8,6 @@ import {
   GeoJSON,
   Tooltip,
 } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import "./CommunityMap.css";
 import L from "leaflet";
 // import jaipurBoundary from "../data/Jaipur_Wards.geojson"; - This line will be removed

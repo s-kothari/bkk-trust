@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { PAGE_BACKGROUND_COLOR } from "../colors";
 
 interface HeroGridProps {
@@ -13,19 +14,26 @@ const HeroGrid: React.FC<HeroGridProps> = ({ title, subtitle, images }) => {
       {images.length > 1 ? (
         <div className="absolute inset-0 h-64 sm:h-[70vh] w-full grid grid-cols-2 sm:grid-cols-3">
           {images.map((image, index) => (
-            <img
-              key={index}
-              src={image}
-              alt={`${title} collage ${index + 1}`}
-              className="h-64 sm:h-[70vh] w-full object-cover"
-            />
+            <div key={index} className="relative h-64 sm:h-[70vh] w-full">
+              <Image
+                src={image}
+                alt={`${title} collage ${index + 1}`}
+                fill
+                sizes="(max-width: 640px) 50vw, 33vw"
+                className="object-cover"
+                priority={index === 0}
+              />
+            </div>
           ))}
         </div>
       ) : (
-        <img
+        <Image
           src={images[0]}
           alt={title}
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
         />
       )}
       {/* <div className="absolute inset-0 bg-black opacity-40"></div> */}

@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 interface ProgramCardProps {
   program: {
@@ -13,11 +14,14 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
   return (
     <div className="flex flex-col h-full overflow-hidden rounded-lg shadow-lg">
       {program.image && (
-        <div className="flex-shrink-0">
-          <img
-            className="h-64 w-full object-cover"
+        <div className="flex-shrink-0 relative h-64 w-full">
+          <Image
+            className="object-cover"
             src={program.image}
             alt={program.title}
+            fill
+            sizes="(max-width: 640px) 100vw, 33vw"
+            priority={false}
           />
         </div>
       )}

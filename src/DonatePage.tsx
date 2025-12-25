@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import DonationInquiryForm from "./components/DonationInquiryForm";
 import Hero from "./components/Hero";
 import HeroGrid from "./components/HeroGrid";
@@ -79,8 +79,8 @@ const DonatePage: React.FC = () => {
                 We believe every child deserves the chance to succeed. We
                 provide underprivileged children with academic support, digital
                 literacy, and a nurturing environment. Your donation can sponsor
-                a child's education or provide them with vocational skills for a
-                brighter future.
+                a child&apos;s education or provide them with vocational skills
+                for a brighter future.
               </p>
               <p className="mt-6 font-semibold text-amber-600">
                 Help a child learn and grow.
@@ -90,7 +90,7 @@ const DonatePage: React.FC = () => {
 
           <div className="mt-16 text-center">
             <Link
-              to="/impact"
+              href="/impact"
               className="text-lg font-semibold leading-6 text-amber-600 hover:text-amber-800"
             >
               Your donation enables us to create impact. See what we do with

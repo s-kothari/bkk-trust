@@ -1,7 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { childrensPrograms, womensPrograms } from "./programs";
-import CommunityMap from "./components/CommunityMap";
+import dynamic from "next/dynamic";
+const CommunityMap = dynamic(() => import("./components/CommunityMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-96 w-full rounded-2xl overflow-hidden shadow-lg bg-gray-100" />
+  ),
+});
 import Hero from "./components/Hero";
 
 const ImpactPage: React.FC = () => {
@@ -62,10 +68,10 @@ const ImpactPage: React.FC = () => {
             </dl>
             <div className="mt-12 text-center">
               <Link
-                to="/impact/women"
+                href="/impact/women"
                 className="text-amber-600 hover:text-amber-800 font-semibold"
               >
-                Learn About Our Women's Empowerment Initiatives &rarr;
+                Learn About Our Women&apos;s Empowerment Initiatives &rarr;
               </Link>
             </div>
           </div>
@@ -101,10 +107,10 @@ const ImpactPage: React.FC = () => {
             </dl>
             <div className="mt-12 text-center">
               <Link
-                to="/impact/children"
+                href="/impact/children"
                 className="text-amber-600 hover:text-amber-800 font-semibold"
               >
-                Explore All Children's Courses &rarr;
+                Explore All Children&apos;s Courses &rarr;
               </Link>
             </div>
           </div>

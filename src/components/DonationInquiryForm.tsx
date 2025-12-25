@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 
 const interestOptions = [
@@ -80,9 +81,9 @@ Selected areas of interest:
             Where your money can go
           </h2>
           <p className="mt-4 text-lg leading-8 text-gray-600">
-            Let us know what you're passionate about. We'll get back to you with
-            information on how your contribution can make a difference in your
-            area of interest.
+            Let us know what you&apos;re passionate about. We&apos;ll get back
+            to you with information on how your contribution can make a
+            difference in your area of interest.
           </p>
         </div>
         {!submitted ? (
@@ -203,7 +204,7 @@ Selected areas of interest:
               </a>
             </div>
             <p className="mt-6 text-sm text-gray-500">
-              If the button doesn't work, you can manually send an email to{" "}
+              If the button doesn&apos;t work, you can manually send an email to{" "}
               <a
                 href="mailto:suyash.kothari4@gmail.com"
                 className="font-semibold text-amber-600"

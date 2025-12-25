@@ -7,7 +7,7 @@ const ChildrensPage: React.FC = () => {
   return (
     <div>
       <Hero
-        title="Investing in the Next Generation"
+        title="Programs for Children"
         subtitle="Nurturing underprivileged youth to build a brighter future."
         image="/impact/childrens_art_class.png"
       />
