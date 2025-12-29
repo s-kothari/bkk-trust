@@ -30,6 +30,8 @@ interface MobileMenuProps {
 }
 
 const totalAnimationDuration = 2000;
+const HEADER_EXPANDED = "100vh";
+const HEADER_COLLAPSED = "80px";
 
 const sunContainerVariants = {
   initial: { bottom: "40%", y: "50%", scale: 1 },
@@ -152,44 +154,109 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
   const { scrollY } = useScroll();
   const router = useRouter();
   const pathname = usePathname();
-  const [headerCollapsed, setHeaderCollapsed] = useState(false);
+  const logoAnimationEnabled = false;
+  const animationDisabled = !logoAnimationEnabled;
+  const initialCollapsed = animationDisabled ? false : false;
+  const initialStep = animationDisabled ? 1 : 0;
+  const initialSunRisen = animationDisabled ? true : false;
+
+  const [headerCollapsed, setHeaderCollapsed] = useState(initialCollapsed);
   const [animationProgress, setAnimationProgress] = useState(0);
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0); // 0: start, 1: animated, 2: collapsed
+  const [currentStep, setCurrentStep] = useState(initialStep); // 0: start, 1: animated, 2: collapsed
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isSunRisen, setIsSunRisen] = useState(false);
+  const [isSunRisen, setIsSunRisen] = useState(initialSunRisen);
+  const [hasMounted, setHasMounted] = useState(false);
+  const [manualExpand, setManualExpand] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const manualExpandTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const tickingRef = useRef(false);
   const prefersReducedMotion = useReducedMotion();
 
   const isHomePage = pathname === "/";
   const isLightBg = currentStep >= 1;
+  const sunVariantKey = animationDisabled
+    ? headerCollapsed
+      ? "collapsed"
+      : "risen"
+    : headerCollapsed
+    ? "collapsed"
+    : currentStep >= 1
+    ? "risen"
+    : "initial";
+  const staticSunRisen = animationDisabled ? true : isSunRisen;
+  const staticStep = animationDisabled ? 1 : currentStep;
 
-  // Set header state based on page and trigger auto-animation
+  const sunVariant = sunContainerVariants[
+    sunVariantKey
+  ] as (typeof sunContainerVariants)[typeof sunVariantKey] & {
+    transition?: unknown;
+  };
+  const { transition: _sunTransition, ...sunVariantValues } = sunVariant;
+  const leftFlagFinal = {
+    scale: staticSunRisen ? 1 : 0,
+    opacity: staticSunRisen ? 1 : 0,
+    y: -50,
+    rotate: -25,
+  };
+  const rightFlagFinal = {
+    scale: staticSunRisen ? 1 : 0,
+    opacity: staticSunRisen ? 1 : 0,
+    y: -50,
+    rotate: 25,
+  };
+  const sunRayFinal = {
+    scaleY: staticSunRisen ? 1 : 0,
+    opacity: staticSunRisen ? 1 : 0,
+  };
+  const sunCoreFinal = {
+    scale: staticStep >= 1 ? 1 : 0.8,
+    opacity: staticStep >= 1 ? 1 : 0,
+    background: staticStep >= 1 ? "#fbbf24" : "#fde68a",
+    boxShadow:
+      staticStep >= 1
+        ? ""
+        : "0 0 40px rgba(251, 191, 36, 0.5), 0 0 5px rgba(0, 0, 0, 0.5)",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: staticStep >= 1 ? "black" : "#f59e0b",
+  };
+  const sunFaceFinal = { opacity: staticSunRisen ? 1 : 0 };
+  const bannerFinal = { opacity: staticSunRisen ? 1 : 0 };
+
+  useEffect(() => {
+    setHasMounted(true);
+    return () => {
+      if (manualExpandTimeoutRef.current) {
+        clearTimeout(manualExpandTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Keep a shared CSS variable in sync so the main content can track header height
+  useEffect(() => {
+    const value = headerCollapsed ? HEADER_COLLAPSED : HEADER_EXPANDED;
+    document.documentElement.style.setProperty("--header-height", value);
+    return () => {
+      document.documentElement.style.removeProperty("--header-height");
+    };
+  }, [headerCollapsed]);
+
+  // Set header state based on page; homepage starts collapsed
   useEffect(() => {
     // Cleanup previous timeouts
     if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
     if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
 
-    if (!isHomePage) {
-      setHeaderCollapsed(true);
-      setHasScrolled(true);
-      setCurrentStep(2);
-      setIsLocked(true);
-      setAnimationProgress(1);
-      setIsSunRisen(true);
-    } else {
-      // Reset state for home page
-      setHeaderCollapsed(false);
-      setHasScrolled(true);
-      setCurrentStep(1);
-      setIsLocked(false);
-      setAnimationProgress(1);
-      setIsAnimating(false);
-      setIsSunRisen(true);
-    }
+    // Home loads collapsed; expand only on logo click. Subpages stay collapsed.
+    setHeaderCollapsed(true);
+    setHasScrolled(true);
+    setCurrentStep(2);
+    setIsLocked(true);
+    setAnimationProgress(1);
+    setIsSunRisen(true);
 
     return () => {
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
@@ -205,23 +272,17 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
   } as const;
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (isAnimating || !isHomePage) return;
+    if (isAnimating || !isHomePage || manualExpand) return;
     if (tickingRef.current) return;
     tickingRef.current = true;
     requestAnimationFrame(() => {
       const shouldCollapse = latest > SCROLL_THRESHOLDS.COLLAPSE_AT;
-      const shouldExpand = latest < SCROLL_THRESHOLDS.EXPAND_AT;
 
       setHeaderCollapsed((wasCollapsed) => {
         if (!wasCollapsed && shouldCollapse) {
           setIsLocked(true);
           setCurrentStep(2);
           return true;
-        }
-        if (wasCollapsed && shouldExpand) {
-          setIsLocked(false);
-          setCurrentStep(1);
-          return false;
         }
         return wasCollapsed;
       });
@@ -234,6 +295,24 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
     setHeaderCollapsed(true);
     setIsLocked(true);
     setCurrentStep(2);
+  };
+
+  const handleLogoClick = () => {
+    if (isHomePage && headerCollapsed) {
+      setHeaderCollapsed(false);
+      setIsLocked(false);
+      setCurrentStep(1);
+      setIsSunRisen(true);
+      setManualExpand(true);
+      if (manualExpandTimeoutRef.current) {
+        clearTimeout(manualExpandTimeoutRef.current);
+      }
+      manualExpandTimeoutRef.current = setTimeout(() => {
+        setManualExpand(false);
+      }, 800);
+      return;
+    }
+    handleNavClick("");
   };
 
   const handleNavClick = (section: string) => {
@@ -312,9 +391,19 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
       />
       <motion.header
         className="fixed top-0 left-0 right-0 z-50"
-        initial={{ height: "100vh" }}
-        animate={{ height: headerCollapsed ? "80px" : "100vh" }}
-        transition={{ duration: 0.6, ease: "easeInOut" }}
+        style={{ height: "var(--header-height)" }}
+        initial={{ "--header-height": HEADER_COLLAPSED } as any}
+        animate={
+          {
+            "--header-height": headerCollapsed
+              ? HEADER_COLLAPSED
+              : HEADER_EXPANDED,
+          } as any
+        }
+        transition={{
+          duration: hasMounted ? 0.6 : 0,
+          ease: "easeInOut",
+        }}
       >
         {/* Main container with gradient background */}
         <div
@@ -354,34 +443,47 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
           <motion.div
             className="absolute  inset-x-0 flex justify-center z-10"
             variants={sunContainerVariants}
-            initial="initial"
-            animate={
-              headerCollapsed
-                ? "collapsed"
-                : currentStep >= 1
-                ? "risen"
-                : "initial"
+            initial={logoAnimationEnabled ? "initial" : sunVariantKey}
+            animate={sunVariantKey}
+            style={{
+              pointerEvents: "auto",
+            }}
+            transition={
+              logoAnimationEnabled
+                ? undefined
+                : { duration: hasMounted ? 0.6 : 0, ease: "easeInOut" }
             }
-            style={{ pointerEvents: headerCollapsed ? "none" : "auto" }}
-            onClick={() => handleNavClick("")}
+            onClick={handleLogoClick}
           >
             <div className="absolute inset-x-0 flex justify-center items-center hover:cursor-pointer z-0">
               {/* Left Flag */}
               <motion.div
                 className="relative flex-shrink-0"
                 style={{ marginRight: "0px" }}
-                initial={{ scale: 0, opacity: 0, y: 20, rotate: -20 }}
-                animate={{
-                  scale: isSunRisen ? 1 : 0,
-                  opacity: isSunRisen ? 1 : 0,
-                  y: -50,
-                  rotate: -25,
-                }}
+                initial={
+                  logoAnimationEnabled
+                    ? { scale: 0, opacity: 0, y: 20, rotate: -20 }
+                    : leftFlagFinal
+                }
+                animate={
+                  logoAnimationEnabled
+                    ? {
+                        scale: isSunRisen ? 1 : 0,
+                        opacity: isSunRisen ? 1 : 0,
+                        y: -50,
+                        rotate: -25,
+                      }
+                    : undefined
+                }
                 exit={{ scale: 0, opacity: 0 }}
-                transition={{
-                  duration: 0.6,
-                  delay: totalAnimationDuration / 1000 + 0.2,
-                }}
+                transition={
+                  logoAnimationEnabled
+                    ? {
+                        duration: 0.6,
+                        delay: totalAnimationDuration / 1000 + 0.2,
+                      }
+                    : { duration: 0 }
+                }
               >
                 <div className="relative w-64 h-[12.5rem]">
                   <Image
@@ -401,18 +503,30 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
               <motion.div
                 className="relative flex-shrink-0"
                 style={{ marginLeft: "0px" }}
-                initial={{ scale: 0, opacity: 0, y: 20, rotate: 20 }}
-                animate={{
-                  scale: isSunRisen ? 1 : 0,
-                  opacity: isSunRisen ? 1 : 0,
-                  y: -50,
-                  rotate: 25,
-                }}
+                initial={
+                  logoAnimationEnabled
+                    ? { scale: 0, opacity: 0, y: 20, rotate: 20 }
+                    : rightFlagFinal
+                }
+                animate={
+                  logoAnimationEnabled
+                    ? {
+                        scale: isSunRisen ? 1 : 0,
+                        opacity: isSunRisen ? 1 : 0,
+                        y: -50,
+                        rotate: 25,
+                      }
+                    : undefined
+                }
                 exit={{ scale: 0, opacity: 0 }}
-                transition={{
-                  duration: 0.6,
-                  delay: totalAnimationDuration / 1000 + 0.3,
-                }}
+                transition={
+                  logoAnimationEnabled
+                    ? {
+                        duration: 0.6,
+                        delay: totalAnimationDuration / 1000 + 0.3,
+                      }
+                    : { duration: 0 }
+                }
               >
                 <div className="relative w-64 h-[12.5rem]">
                   <Image
@@ -446,16 +560,28 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                         left: "50%",
                         transform: "translateX(-50%)",
                       }}
-                      initial={{ scaleY: 0, opacity: 0 }}
-                      animate={{
-                        scaleY: isSunRisen ? 1 : 0,
-                        opacity: isSunRisen ? 1 : 0,
-                      }}
-                      transition={{
-                        delay: totalAnimationDuration / 1000 + i * 0.03,
-                        duration: 0.5,
-                        ease: "easeOut",
-                      }}
+                      initial={
+                        logoAnimationEnabled
+                          ? { scaleY: 0, opacity: 0 }
+                          : sunRayFinal
+                      }
+                      animate={
+                        logoAnimationEnabled
+                          ? {
+                              scaleY: isSunRisen ? 1 : 0,
+                              opacity: isSunRisen ? 1 : 0,
+                            }
+                          : undefined
+                      }
+                      transition={
+                        logoAnimationEnabled
+                          ? {
+                              delay: totalAnimationDuration / 1000 + i * 0.03,
+                              duration: 0.5,
+                              ease: "easeOut",
+                            }
+                          : { duration: 0 }
+                      }
                     >
                       <div
                         style={{
@@ -504,29 +630,39 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
               {/* Sun core - in front of rays */}
               <motion.div
                 className="absolute inset-0 z-10 rounded-full"
-                initial={{
-                  scale: 0.8,
-                  opacity: 0.9,
-                  background: "#fde68a",
-                  boxShadow:
-                    "0 0 40px rgba(251, 191, 36, 0.5), 0 0 5px rgba(0, 0, 0, 0.5)",
-                  borderWidth: "2px",
-                  borderStyle: "solid",
-                  borderColor: "#f59e0b",
-                }}
-                animate={{
-                  scale: currentStep >= 1 ? 1 : 0.8,
-                  opacity: currentStep >= 1 ? 1 : 0,
-                  background: currentStep >= 1 ? "#fbbf24" : "#fde68a",
-                  boxShadow:
-                    currentStep >= 1
-                      ? ""
-                      : "0 0 40px rgba(251, 191, 36, 0.5), 0 0 5px rgba(0, 0, 0, 0.5)",
-                  borderWidth: "1px",
-                  borderStyle: "solid",
-                  borderColor: currentStep >= 1 ? "black" : "#f59e0b",
-                }}
-                transition={{ duration: 0.8 }}
+                initial={
+                  logoAnimationEnabled
+                    ? {
+                        scale: 0.8,
+                        opacity: 0.9,
+                        background: "#fde68a",
+                        boxShadow:
+                          "0 0 40px rgba(251, 191, 36, 0.5), 0 0 5px rgba(0, 0, 0, 0.5)",
+                        borderWidth: "2px",
+                        borderStyle: "solid",
+                        borderColor: "#f59e0b",
+                      }
+                    : sunCoreFinal
+                }
+                animate={
+                  logoAnimationEnabled
+                    ? {
+                        scale: currentStep >= 1 ? 1 : 0.8,
+                        opacity: currentStep >= 1 ? 1 : 0,
+                        background: currentStep >= 1 ? "#fbbf24" : "#fde68a",
+                        boxShadow:
+                          currentStep >= 1
+                            ? ""
+                            : "0 0 40px rgba(251, 191, 36, 0.5), 0 0 5px rgba(0, 0, 0, 0.5)",
+                        borderWidth: "1px",
+                        borderStyle: "solid",
+                        borderColor: currentStep >= 1 ? "black" : "#f59e0b",
+                      }
+                    : undefined
+                }
+                transition={
+                  logoAnimationEnabled ? { duration: 0.8 } : { duration: 0 }
+                }
               />
 
               {/* Sun face image */}
@@ -534,12 +670,20 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                 src="/sun_face.png"
                 alt="Sun face"
                 className="absolute inset-0 w-full p-[2px] h-full object-contain z-20"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: isSunRisen ? 1 : 0 }}
-                transition={{
-                  duration: 0.8,
-                  delay: totalAnimationDuration / 1000 + 0.3,
-                }}
+                initial={logoAnimationEnabled ? { opacity: 0 } : sunFaceFinal}
+                animate={
+                  logoAnimationEnabled
+                    ? { opacity: isSunRisen ? 1 : 0 }
+                    : undefined
+                }
+                transition={
+                  logoAnimationEnabled
+                    ? {
+                        duration: 0.8,
+                        delay: totalAnimationDuration / 1000 + 0.3,
+                      }
+                    : { duration: 0 }
+                }
               />
             </div>
 
@@ -549,20 +693,28 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
               alt="Banner"
               className="absolute w-[26rem] object-contain drop-shadow-lg z-10 cursor-pointer"
               style={{ top: "-30px" }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isSunRisen ? 1 : 0 }}
-              transition={{
-                duration: 0.8,
-                delay: totalAnimationDuration / 1000 + 0.3,
-              }}
-              onClick={() => handleNavClick("")}
+              initial={logoAnimationEnabled ? { opacity: 0 } : bannerFinal}
+              animate={
+                logoAnimationEnabled
+                  ? { opacity: isSunRisen ? 1 : 0 }
+                  : undefined
+              }
+              transition={
+                logoAnimationEnabled
+                  ? {
+                      duration: 0.8,
+                      delay: totalAnimationDuration / 1000 + 0.3,
+                    }
+                  : { duration: 0 }
+              }
+              onClick={handleLogoClick}
               role="link"
               aria-label="Go to home"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  handleNavClick("");
+                  handleLogoClick();
                 }
               }}
             />
@@ -614,9 +766,9 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <div className="flex items-center justify-between px-4 sm:px-8 py-5">
+            <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-8 py-5">
               <motion.div
-                className="font-bold text-base cursor-pointer uppercase"
+                className="font-bold text-sm cursor-pointer text-center font-serif"
                 onClick={() => handleNavClick("")}
                 animate={{
                   opacity: headerCollapsed ? 1 : 0,
@@ -625,7 +777,9 @@ const Header: React.FC<HeaderProps> = ({ isLocked, setIsLocked }) => {
                 }}
                 transition={{ duration: 0.3 }}
               >
-                <span className="hidden sm:inline">BKK Charitable Trust</span>
+                <span className="hidden sm:inline leading-tight whitespace-pre-line">
+                  {`Bhimraj Kamlawati Kothari\nCharitable Trust`}
+                </span>
                 <span className="inline sm:hidden">BKK Trust</span>
               </motion.div>
 

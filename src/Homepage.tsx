@@ -65,21 +65,23 @@ const HomePage: React.FC<HomePageProps> = ({ isLocked }) => {
       {/* The Header is now handled globally in App.tsx */}
 
       {/* Demo content to show scrolling */}
-      <div className="bg-[#fbbf24] p-8">
-        <h2 className="text-4xl font-bold black mb-4 font-didact">
-          Bhimraj Kamlawati Kothari Charitable Trust
-        </h2>
-        <p className="text-gray-800">
-          A family-run effort to empower women and children in Jaipur,
-          Rajasthan.
-        </p>
-      </div>
+      <section className="bg-[#fbbf24] py-8">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <h2 className="text-4xl font-bold black mb-4 font-didact">
+            Bhimraj Kamlawati Kothari Charitable Trust
+          </h2>
+          <p className="text-gray-800">
+            A family-run effort to empower women and children in Jaipur,
+            Rajasthan.
+          </p>
+        </div>
+      </section>
 
-      <div
-        className="min-h-screen p-8"
+      <section
+        className="min-h-screen py-12"
         style={{ scrollSnapAlign: isLocked ? "none" : "start" }}
       >
-        <div className=" mx-auto">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 sm:gap-2 gap-8 items-stretch">
             {sections.map((s) => (
               <ProgramCard key={s.program.title} program={s.program} />
@@ -87,7 +89,7 @@ const HomePage: React.FC<HomePageProps> = ({ isLocked }) => {
           </div>
           {/* Demo content blocks */}
         </div>
-      </div>
+      </section>
 
       {/* <Footer></Footer> */}
     </div>
