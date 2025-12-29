@@ -186,16 +186,18 @@ const OurStory: React.FC = () => {
                   href={benefactor.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-24 w-full items-center justify-center border border-gray-200 bg-white p-4 transition-shadow hover:shadow-lg"
+                  className="flex h-24 w-full items-center justify-center overflow-hidden border border-gray-200 bg-white p-4 transition-shadow hover:shadow-lg"
                 >
                   {benefactor.image ? (
-                    <Image
-                      src={benefactor.image}
-                      alt={benefactor.name}
-                      width={200}
-                      height={80}
-                      className="object-contain"
-                    />
+                    <div className="relative h-full w-full">
+                      <Image
+                        src={benefactor.image}
+                        alt={benefactor.name}
+                        fill
+                        sizes="(max-width: 640px) 50vw, 200px"
+                        className="object-contain"
+                      />
+                    </div>
                   ) : (
                     <span className="text-center font-semibold text-gray-700">
                       {benefactor.name}
@@ -205,16 +207,18 @@ const OurStory: React.FC = () => {
               ) : (
                 <div
                   key={benefactor.name}
-                  className="flex h-24 w-full items-center justify-center border border-gray-200 bg-white p-4"
+                  className="flex h-24 w-full items-center justify-center overflow-hidden border border-gray-200 bg-white p-4"
                 >
                   {benefactor.image ? (
-                    <Image
-                      src={benefactor.image}
-                      alt={benefactor.name}
-                      width={200}
-                      height={80}
-                      className="object-contain"
-                    />
+                    <div className="relative h-full w-full">
+                      <Image
+                        src={benefactor.image}
+                        alt={benefactor.name}
+                        fill
+                        sizes="(max-width: 640px) 50vw, 200px"
+                        className="object-contain"
+                      />
+                    </div>
                   ) : (
                     <span className="text-center font-semibold text-gray-700">
                       {benefactor.name}
