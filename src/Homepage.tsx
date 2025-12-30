@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Footer from "./components/footer";
 import Hero from "./components/Hero";
+import FounderMessage from "./components/founder-message";
 import ProgramCard from "./components/ProgramCard";
 import { BookOpen, ShoppingBasket, Users } from "lucide-react";
 
@@ -62,6 +63,7 @@ const HomePage: React.FC<HomePageProps> = ({ isLocked }) => {
         subtitle="A philanthropic effort to empower women and children in Jaipur, Rajasthan."
         image="/impact/childrens_art_class.png"
       />
+
       {/* The Header is now handled globally in App.tsx */}
 
       {/* Demo content to show scrolling */}
@@ -78,7 +80,7 @@ const HomePage: React.FC<HomePageProps> = ({ isLocked }) => {
       </section>
 
       <section
-        className="min-h-screen py-12"
+        className="py-12"
         style={{ scrollSnapAlign: isLocked ? "none" : "start" }}
       >
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -90,6 +92,7 @@ const HomePage: React.FC<HomePageProps> = ({ isLocked }) => {
           {/* Demo content blocks */}
         </div>
       </section>
+      <FounderMessage />
 
       {/* <Footer></Footer> */}
     </div>
